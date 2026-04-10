@@ -1,78 +1,64 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/core";
-import { ElMessage } from "element-plus";
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
 
-const greetMsg = ref("");
-const name = ref("");
-const loading = ref(false);
-const isMenuCollapsed = ref(false);
 const activeMenu = ref("rename");
+const router = useRouter();
+const route = useRoute();
 
-async function greet() {
-  if (!name.value.trim()) {
-    ElMessage.warning("请输入姓名后再提交");
-    return;
-  }
+const menuRouteMap: Record<string, string> = {
+  rename: "/rename",
+  settings: "/settings",
+};
 
-  loading.value = true;
-  try {
-    greetMsg.value = await invoke("greet", { name: name.value });
-    ElMessage.success("调用成功");
-  } finally {
-    loading.value = false;
+const routeMenuMap: Record<string, string> = {
+  "/rename": "rename",
+  "/settings": "settings",
+};
+
+watch(
+  () => route.path,
+  (path) => {
+    activeMenu.value = routeMenuMap[path] ?? "rename";
+  },
+  { immediate: true },
+);
+
+function handleMenuSelect(index: string) {
+  const targetPath = menuRouteMap[index] ?? "/rename";
+  if (targetPath !== route.path) {
+    void router.push(targetPath);
   }
 }
 </script>
 
 <template>
   <main class="page">
-    <el-container class="layout">
+    <el-container class="layout" >
       <el-aside :width="'64px'" class="sidebar">
         <el-menu
-          v-model="activeMenu"
           :default-active="activeMenu"
           :collapse="false"
           class="menu"
+          @select="handleMenuSelect"
         >
-          <el-menu-item index="home">首页</el-menu-item>
           <el-menu-item index="rename">批量重命名</el-menu-item>
           <el-menu-item index="settings">设置</el-menu-item>
         </el-menu>
       </el-aside>
 
       <el-main class="content">
-        <el-card class="card" shadow="hover">
+        <RenamePage v-if="activeMenu === 'rename'" />
+        <el-card v-if="activeMenu === 'settings'" class="card" shadow="hover">
           <template #header>
             <div class="card-header">
-              <span>Tauri + Vue + Element</span>
-              <el-tag type="success">Ready</el-tag>
+              <span>设置</span>
             </div>
           </template>
-
-          <el-form @submit.prevent="greet">
-            <el-form-item label="姓名">
-              <el-input v-model="name" placeholder="请输入姓名" clearable />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" :loading="loading" @click="greet">
-                Greet
-              </el-button>
-            </el-form-item>
-          </el-form>
-
-          <el-alert
-            v-if="greetMsg"
-            :title="greetMsg"
-            type="success"
-            :closable="false"
-            show-icon
-          />
+          <el-empty description="设置功能开发中" />
         </el-card>
-
-        <RenamePage />
       </el-main>
     </el-container>
   </main>
@@ -80,13 +66,15 @@ async function greet() {
 
 <style scoped>
 .page {
-  min-height: 100vh;
+  height: 100vh;
   padding: 0;
   background: #f5f7fa;
+  overflow: hidden;
 }
 
 .layout {
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -110,6 +98,7 @@ async function greet() {
   flex-direction: column;
   gap: 16px;
   padding: 24px;
+  overflow: hidden;
 }
 
 .card {
@@ -120,5 +109,15 @@ async function greet() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+</style>
+
+<style>
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 </style>
