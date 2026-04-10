@@ -46,7 +46,7 @@ async function handleOpenFile() {
   });
 
   if (!file_path || Array.isArray(file_path)) {
-    ElMessage.info("未选择单个文件。");
+    ElMessage.info("未选择单个文件.");
     return;
   }
 
@@ -101,16 +101,16 @@ async function handleOpenFolder() {
     <el-divider/>
     <el-table :data="fileInfo" style="width: 100%" border :header-cell-style="{ textAlign: 'center' }">
       <el-table-column type="index" label="序号" width="80" align="center"/>
-      <el-table-column prop="fileName" label="文件名" align="center" />
+      <el-table-column prop="fileName" label="文件名" align="center" show-overflow-tooltip/>
       <el-table-column prop="filePath" label="文件路径" show-overflow-tooltip />
       <el-table-column prop="fileType" label="文件类型" align="center" width="100"/>
       <el-table-column prop="fileSize" label="文件大小" align="center" width="100"/>
       <el-table-column prop="fileCreateTime" label="创建时间" align="center" show-overflow-tooltip/>
       <el-table-column prop="fileModifyTime" label="修改时间" align="center" show-overflow-tooltip/>
-      <el-table-column label="操作" align="center" width="150" fixed="right">
+      <el-table-column label="操作" align="center" width="200px" fixed="right">
         <template #default>
-          <el-button link type="primary" :icon="icons.Edit" size="small">重命名</el-button>
-          <el-button link type="danger" :icon="icons.Delete" size="small">删除</el-button>
+          <el-button link type="primary" :icon="icons.Edit">重命名</el-button>
+          <el-button link type="danger" :icon="icons.Delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
