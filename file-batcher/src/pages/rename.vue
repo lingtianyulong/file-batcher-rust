@@ -3,9 +3,7 @@ import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import * as icons from "@element-plus/icons-vue";
 import { open } from "@tauri-apps/plugin-dialog";
-// import { fa } from "element-plus/es/locale/index.mjs";
 import { invoke } from "@tauri-apps/api/core";
-import { el } from "element-plus/es/locale/index.mjs";
 
 type FileInfoRow = {
   fileName: string;
