@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { EditPen, Expand, Fold, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
 
 const activeMenu = ref("rename");
 const router = useRouter();
 const route = useRoute();
+const isCollapsed = ref(false);
 
 const menuRouteMap: Record<string, string> = {
   rename: "/rename",
@@ -32,20 +34,38 @@ function handleMenuSelect(index: string) {
     void router.push(targetPath);
   }
 }
+
+function toggleSidebar() {
+  isCollapsed.value = !isCollapsed.value;
+}
 </script>
 
 <template>
   <main class="page">
-    <el-container class="layout" >
-      <el-aside :width="'64px'" class="sidebar">
+    <el-container class="layout">
+      <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar">
+        <div class="sidebar-toggle">
+          <el-button text class="sidebar-toggle-btn" @click="toggleSidebar">
+            <el-icon>
+              <Expand v-if="isCollapsed" />
+              <Fold v-else />
+            </el-icon>
+          </el-button>
+        </div>
         <el-menu
           :default-active="activeMenu"
-          :collapse="false"
+          :collapse="isCollapsed"
           class="menu"
           @select="handleMenuSelect"
         >
-          <el-menu-item index="rename">批量重命名</el-menu-item>
-          <el-menu-item index="settings">设置</el-menu-item>
+          <el-menu-item index="rename">
+            <el-icon><EditPen /></el-icon>
+            <span>重命名</span>
+          </el-menu-item>
+          <el-menu-item index="settings">
+            <el-icon><Setting /></el-icon>
+            <span>设置</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 
@@ -81,12 +101,19 @@ function handleMenuSelect(index: string) {
   border-right: 1px solid #e4e7ed;
   background: #fff;
   transition: width 0.2s ease;
+  overflow: hidden;   /* 移除滚动条 */
 }
 
 .sidebar-toggle {
   display: flex;
   justify-content: flex-end;
-  padding: 8px 10px 4px;
+  padding: 8px 8px 4px;
+}
+
+.sidebar-toggle-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
 }
 
 .menu {
