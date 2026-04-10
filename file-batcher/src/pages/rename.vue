@@ -5,6 +5,7 @@ import * as icons from "@element-plus/icons-vue";
 import { open } from "@tauri-apps/plugin-dialog";
 // import { fa } from "element-plus/es/locale/index.mjs";
 import { invoke } from "@tauri-apps/api/core";
+import { el } from "element-plus/es/locale/index.mjs";
 
 type FileInfoRow = {
   fileName: string;
@@ -106,6 +107,12 @@ async function handleOpenFolder() {
       <el-table-column prop="fileSize" label="文件大小" align="center" width="100"/>
       <el-table-column prop="fileCreateTime" label="创建时间" align="center" show-overflow-tooltip/>
       <el-table-column prop="fileModifyTime" label="修改时间" align="center" show-overflow-tooltip/>
+      <el-table-column label="操作" align="center" width="150" fixed="right">
+        <template #default>
+          <el-button link type="primary" :icon="icons.Edit" size="small">重命名</el-button>
+          <el-button link type="danger" :icon="icons.Delete" size="small">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </el-card>
 </template>
