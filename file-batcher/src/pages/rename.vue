@@ -14,27 +14,7 @@ type FileInfoRow = {
   fileModifyTime: string;
 };
 
-// const prefix = ref("");
-// const startNumber = ref(1);
-// const paddingLength = ref(3);
-// const previewCount = ref(5);
 const fileInfo = ref<FileInfoRow[]>([]);
-
-// const previewNames = computed(() => {
-//   const total = Math.max(1, previewCount.value);
-//   const start = Math.max(0, startNumber.value);
-//   const padding = Math.max(1, paddingLength.value);
-//   const safePrefix = prefix.value.trim();
-
-//   return Array.from({ length: total }, (_, index) => {
-//     const current = String(start + index).padStart(padding, "0");
-//     return `${safePrefix}${current}`;
-//   });
-// });
-
-// function handleApplyRename() {
-//   ElMessage.info("这是重命名页面占位逻辑，后续可接入 Tauri 实际重命名命令。");
-// }
 
 async function handleOpenFile() {
   // 打开文件选择对话框并获取文件名
