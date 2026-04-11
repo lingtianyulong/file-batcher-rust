@@ -1,14 +1,14 @@
 // 按钮命令
-use std::fs;
 use crate::models::file_info::FileInfo;
 use chrono::{DateTime, Local};
+use humansize::{format_size, BINARY};
+use std::fs;
 use std::path::Path;
-use humansize::{ BINARY, format_size};
 use std::time::SystemTime;
-
 
 #[tauri::command]
 pub fn get_file_info(file_path: &str) -> Result<String, String> {
+    log::info!("get_file_info: {}", file_path);
     let path = Path::new(file_path);
     if !path.exists() {
         return Err(format!("File not found: {}", file_path));
@@ -59,6 +59,7 @@ pub fn get_file_info(file_path: &str) -> Result<String, String> {
         file_create_time: Some(file_create_time),
         file_modify_time: Some(file_modify_time),
     });
-    Ok(json.to_string())
+    let json = json.to_string();
+    log::info!("get_file_info result: {}", json);
+    Ok(json)
 }
-
