@@ -102,8 +102,8 @@ function toggleSidebar() {
 }
 
 .sidebar {
-  border-right: 1px solid rgba(228, 231, 237, 0.6);
-  background: rgba(255, 255, 255, 0.45);
+  border-right: 1px solid rgba(180, 190, 210, 0.7);
+  background: rgba(255, 255, 255, 0.62);
   transition: width 0.2s ease;
   overflow: hidden;   /* 移除滚动条 */
 }
@@ -123,8 +123,10 @@ function toggleSidebar() {
 .menu {
   border-right: none;
   --el-menu-bg-color: transparent;
-  --el-menu-hover-bg-color: rgba(0, 0, 0, 0.06);
-  --el-menu-active-bg-color: rgba(64, 158, 255, 0.12);
+  --el-menu-text-color: #2c3e50;
+  --el-menu-active-color: #1a6fc4;
+  --el-menu-hover-bg-color: rgba(0, 0, 0, 0.08);
+  --el-menu-active-bg-color: rgba(26, 111, 196, 0.15);
 }
 
 .content {
@@ -158,5 +160,23 @@ body,
 
 .layout > .el-aside {
   background: transparent !important;
+}
+
+.layout > .el-aside .el-menu-item {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.layout > .el-aside .el-menu-item .el-icon {
+  color: #4a5568;
+}
+
+.layout > .el-aside .el-menu-item.is-active {
+  color: #1a6fc4 !important;
+  font-weight: 600;
+}
+
+.layout > .el-aside .el-menu-item.is-active .el-icon {
+  color: #1a6fc4 !important;
 }
 </style>
