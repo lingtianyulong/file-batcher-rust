@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { EditPen, Expand, Fold, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
+import TitleBar from "./components/TitleBar.vue";
 
 const activeMenu = ref("rename");
 const router = useRouter();
@@ -42,6 +43,7 @@ function toggleSidebar() {
 
 <template>
   <main class="page">
+    <TitleBar />
     <el-container class="layout">
       <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar">
         <div class="sidebar-toggle">
@@ -90,10 +92,12 @@ function toggleSidebar() {
   padding: 0;
   background: #f5f7fa;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .layout {
-  height: 100%;
+  flex: 1;
   overflow: hidden;
 }
 
