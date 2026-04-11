@@ -90,7 +90,7 @@ function toggleSidebar() {
 .page {
   height: 100vh;
   padding: 0;
-  background: #f5f7fa;
+  background: transparent;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -102,8 +102,8 @@ function toggleSidebar() {
 }
 
 .sidebar {
-  border-right: 1px solid #e4e7ed;
-  background: #fff;
+  border-right: 1px solid rgba(228, 231, 237, 0.6);
+  background: rgba(255, 255, 255, 0.45);
   transition: width 0.2s ease;
   overflow: hidden;   /* 移除滚动条 */
 }
@@ -122,6 +122,9 @@ function toggleSidebar() {
 
 .menu {
   border-right: none;
+  --el-menu-bg-color: transparent;
+  --el-menu-hover-bg-color: rgba(0, 0, 0, 0.06);
+  --el-menu-active-bg-color: rgba(64, 158, 255, 0.12);
 }
 
 .content {
@@ -150,5 +153,10 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
+  background: transparent;
+}
+
+.layout > .el-aside {
+  background: transparent !important;
 }
 </style>

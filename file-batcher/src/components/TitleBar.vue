@@ -54,14 +54,14 @@ onMounted(async () => {
 
 <style scoped>
 .titlebar {
-  --titlebar-bg: rgba(255, 255, 255, 0.85);
+  --titlebar-bg: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 36px;
   padding: 0 0 0 16px;
   background: var(--titlebar-bg);
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: 1px solid rgba(228, 231, 237, 0.6);
   user-select: none;
   flex-shrink: 0;
 }

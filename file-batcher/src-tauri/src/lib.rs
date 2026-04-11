@@ -6,7 +6,7 @@ use commands::button_commands::*;
 use chrono::Local;
 use tauri::Manager;
 #[cfg(target_os = "windows")]
-use window_vibrancy::apply_blur;
+use window_vibrancy::apply_acrylic;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -32,7 +32,7 @@ pub fn run() {
             let window = app.get_webview_window("main").unwrap();
             #[cfg(target_os = "windows")]
             {
-                let _ = apply_blur(&window, Some((18, 18, 18, 125)));
+                let _ = apply_acrylic(&window, Some((245, 247, 250, 100)));
             }
             window.show().unwrap();
             Ok(())
