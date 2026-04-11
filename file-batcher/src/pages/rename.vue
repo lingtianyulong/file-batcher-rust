@@ -28,7 +28,7 @@ async function handleOpenFile() {
     return;
   }
 
-  const file_info = await invoke<string>("get_file_info", { filePath: file_path });
+  const file_info = await invoke<string>("get_file_info_command", { filePath: file_path });
   const parsed = JSON.parse(file_info) as {
     file_name?: string;
     file_path?: string;

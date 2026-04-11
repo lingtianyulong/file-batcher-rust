@@ -1,7 +1,8 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 mod commands;
-mod models;
+mod file_sys;
+
 use commands::button_commands::*;
 use chrono::Local;
 use tauri::Manager;
@@ -40,7 +41,7 @@ pub fn run() {
         .plugin(log_plugin)
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_file_info])
+        .invoke_handler(tauri::generate_handler![get_file_info_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
