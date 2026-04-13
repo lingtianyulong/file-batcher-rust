@@ -6,8 +6,8 @@ mod file_sys;
 use commands::button_commands::*;
 use chrono::Local;
 use tauri::Manager;
-#[cfg(target_os = "windows")]
-use window_vibrancy::apply_acrylic;
+// #[cfg(target_os = "windows")]
+// use window_vibrancy::apply_acrylic;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -33,7 +33,10 @@ pub fn run() {
             let window = app.get_webview_window("main").unwrap();
             #[cfg(target_os = "windows")]
             {
-                let _ = apply_acrylic(&window, Some((245, 247, 250, 100)));
+                // let _ = apply_acrylic(&window, Some((245, 247, 250, 100)));
+                // only windows 11
+                use window_vibrancy::apply_mica;
+                let _ = apply_mica(&window, Some(false));
             }
             window.show().unwrap();
             Ok(())
@@ -42,6 +45,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![get_file_info_command])
+        .invoke_handler(tauri::generate_handler![get_file_list_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

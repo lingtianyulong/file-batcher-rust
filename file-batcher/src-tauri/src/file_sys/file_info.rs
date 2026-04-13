@@ -93,3 +93,32 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
         file_modify_time: Some(file_modify_time),
     })
 }
+
+/**
+ * 获取文件列表
+ * @param file_path: &str
+ * @return: Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>>
+ */
+pub fn get_file_list(file_path: &str) -> Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>> {
+    log::info!("get_file_list: {}", file_path);
+    let path = Path::new(file_path);
+    if !path.exists() {
+        let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File not found: {}", file_path));
+        return Err(Box::new(error));
+    }
+    let files = fs::read_dir(path)?;
+    let mut file_list = Vec::new();
+    for file in files {
+        let file = file?;
+        let file_path = file.path();
+        let file_info = match get_file_info(&file_path.to_string_lossy()) {
+            Ok(file_info) => file_info,
+            Err(e) => {
+                log::error!("get file info failed, the error is {}", e.to_string());
+                continue;
+            }
+        };
+        file_list.push(file_info);
+    }
+    Ok(file_list)
+}

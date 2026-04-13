@@ -61,6 +61,25 @@ async function handleOpenFolder() {
   }
 
   ElMessage.success(`已选择文件夹: ${selectedPath}`);
+  const file_list = await invoke<string>("get_file_list_command", { filePath: selectedPath });
+  const parsed = JSON.parse(file_list) as {
+    file_name?: string;
+    file_path?: string;
+    file_type?: string;
+    file_size?: string;
+    file_create_time?: string;
+    file_modify_time?: string;
+  }[];
+
+  fileInfo.value = parsed.map((file: any) => ({
+    fileName: file.file_name ?? "",
+    filePath: file.file_path ?? "",
+    fileType: file.file_type ?? "",
+    fileSize: file.file_size ?? "",
+    fileCreateTime: file.file_create_time ?? "",
+    fileModifyTime: file.file_modify_time ?? "",
+  }));
+
 }
 </script>
 
