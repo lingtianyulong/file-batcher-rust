@@ -47,6 +47,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_file_info_command,
             get_file_list_command,
+            rename_file_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

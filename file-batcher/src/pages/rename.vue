@@ -15,6 +15,9 @@ type FileInfoRow = {
 };
 
 const fileInfo = ref<FileInfoRow[]>([]);
+const renameDialogVisible = ref(false);
+const renameFileName = ref("");
+const currentRenameRow = ref<FileInfoRow | null>(null);
 
 async function handleOpenFile() {
   // 打开文件选择对话框并获取文件名
@@ -81,6 +84,63 @@ async function handleOpenFolder() {
   }));
 
 }
+
+async function handleRename(row: FileInfoRow) {
+  console.log("handleRename", row);
+  currentRenameRow.value = row;
+  renameFileName.value = row.fileName;
+  renameDialogVisible.value = true;
+}
+
+async function handleRenameConfirm() {
+  if (!currentRenameRow.value) {
+    ElMessage.warning("未找到要重命名的文件");
+    return;
+  }
+
+  const newName = renameFileName.value.trim();
+  if (!newName) {
+    ElMessage.info("请输入新的文件名");
+    return;
+  }
+
+  if (newName === currentRenameRow.value.fileName) {
+    ElMessage.info("新文件名不能与原文件名相同");
+    return;
+  }
+
+  try {
+    const renamedFileInfo = await invoke<string>("rename_file_command", {
+      fileDir: currentRenameRow.value.filePath,
+      oldFileName: currentRenameRow.value.fileName,
+      newFileName: newName,
+    });
+    const parsed = JSON.parse(renamedFileInfo) as {
+      file_name?: string;
+      file_path?: string;
+      file_type?: string;
+      file_size?: string;
+      file_create_time?: string;
+      file_modify_time?: string;
+    };
+
+    currentRenameRow.value.fileName = parsed.file_name ?? "";
+    currentRenameRow.value.filePath = parsed.file_path ?? "";
+    currentRenameRow.value.fileType = parsed.file_type ?? "";
+    currentRenameRow.value.fileSize = parsed.file_size ?? "";
+    currentRenameRow.value.fileCreateTime = parsed.file_create_time ?? "";
+    currentRenameRow.value.fileModifyTime = parsed.file_modify_time ?? "";
+
+    renameDialogVisible.value = false;
+    renameFileName.value = "";
+    currentRenameRow.value = null;
+    ElMessage.success("文件重命名成功");
+  } catch (error) {
+    ElMessage.error(String(error));
+  }
+}
+
+
 </script>
 
 <template>
@@ -105,12 +165,29 @@ async function handleOpenFolder() {
       <el-table-column prop="fileCreateTime" label="创建时间" align="center" show-overflow-tooltip/>
       <el-table-column prop="fileModifyTime" label="修改时间" align="center" show-overflow-tooltip/>
       <el-table-column label="操作" align="center" width="200px" fixed="right">
-        <template #default>
-          <el-button link type="primary" :icon="icons.Edit">重命名</el-button>
+        <template #default="scoped">
+          <el-button link type="primary" :icon="icons.Edit" @click="handleRename(scoped.row)">重命名</el-button>
           <el-button link type="danger" :icon="icons.Delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog v-model="renameDialogVisible" title="重命名文件" width="480px">
+      <el-form label-width="100px">
+        <el-form-item label="新文件名">
+          <el-input
+            v-model="renameFileName"
+            placeholder="请输入新的文件名"
+            clearable
+            @keyup.enter="handleRenameConfirm"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="renameDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleRenameConfirm">确认</el-button>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 

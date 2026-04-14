@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Local};
 use humansize::{format_size, BINARY};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 
@@ -121,4 +121,51 @@ pub fn get_file_list(file_path: &str) -> Result<Vec<FileInfo>, Box<dyn std::erro
         file_list.push(file_info);
     }
     Ok(file_list)
+}
+
+/**
+ * 重命名文件
+ * @param file_dir: &str
+ * @param old_file_name: &str
+ * @param new_file_name: &str
+ * @return: Result<FileInfo, Box<dyn std::error::Error + 'static>>
+ */
+pub fn rename_file(
+    file_dir: &str,
+    old_file_name: &str,
+    new_file_name: &str,
+) -> Result<FileInfo, Box<dyn std::error::Error + 'static>> {
+    log::info!(
+        "rename_file: file_dir={}, old_file_name={}, new_file_name={}",
+        file_dir,
+        old_file_name,
+        new_file_name
+    );
+
+    let new_file_name = new_file_name.trim();
+    if new_file_name.is_empty() {
+        let error = std::io::Error::new(std::io::ErrorKind::InvalidInput, "New file name is empty");
+        return Err(Box::new(error));
+    }
+
+    let old_file_path = PathBuf::from(file_dir).join(old_file_name);
+    if !old_file_path.exists() {
+        let error = std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("File not found: {}", old_file_path.to_string_lossy())
+        );
+        return Err(Box::new(error));
+    }
+
+    let new_file_path = PathBuf::from(file_dir).join(new_file_name);
+    if new_file_path.exists() {
+        let error = std::io::Error::new(
+            std::io::ErrorKind::AlreadyExists,
+            format!("File already exists: {}", new_file_path.to_string_lossy())
+        );
+        return Err(Box::new(error));
+    }
+
+    fs::rename(&old_file_path, &new_file_path)?;
+    get_file_info(&new_file_path.to_string_lossy())
 }
