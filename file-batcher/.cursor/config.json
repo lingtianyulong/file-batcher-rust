@@ -1,0 +1,11 @@
+{
+    "skills": [
+        "rust-backent.skill",
+        "grpc-architect.skill",
+        "tauri-desktop.skill",
+        "cpp-ffi.skill",
+        "debug-expert.skill",
+        "refactor-expert.skill",
+        "agent.skill"
+    ]
+}
