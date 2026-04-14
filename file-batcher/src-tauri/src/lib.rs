@@ -44,8 +44,10 @@ pub fn run() {
         .plugin(log_plugin)
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_file_info_command])
-        .invoke_handler(tauri::generate_handler![get_file_list_command])
+        .invoke_handler(tauri::generate_handler![
+            get_file_info_command,
+            get_file_list_command,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
