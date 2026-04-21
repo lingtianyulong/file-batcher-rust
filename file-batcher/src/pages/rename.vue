@@ -4,6 +4,7 @@ import { ElMessage } from "element-plus";
 import * as icons from "@element-plus/icons-vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
+import BatchOperationDialog from "../components/BatchOperationDialog.vue";
 
 type FileInfoRow = {
   fileName: string;
@@ -18,6 +19,19 @@ const fileInfo = ref<FileInfoRow[]>([]);
 const renameDialogVisible = ref(false);
 const renameFileName = ref("");
 const currentRenameRow = ref<FileInfoRow | null>(null);
+const batchDialogVisible = ref(false);
+
+function handleOpenBatchDialog() {
+  if (fileInfo.value.length === 0) {
+    ElMessage.info("请先打开文件或文件夹");
+    return;
+  }
+  batchDialogVisible.value = true;
+}
+
+function handleBatchUpdated(_files: FileInfoRow[]) {
+  // 组件内已直接在原对象上更新字段，这里保留扩展点
+}
 
 async function handleOpenFile() {
   // 打开文件选择对话框并获取文件名
@@ -153,7 +167,7 @@ async function handleRenameConfirm() {
     <el-form>
       <el-button type="primary" :icon="icons.DocumentAdd" @click="handleOpenFile">打开文件</el-button>
       <el-button type="default" :icon="icons.FolderOpened" @click="handleOpenFolder">打开文件夹</el-button>
-
+      <el-button type="success" :icon="icons.Operation" @click="handleOpenBatchDialog">批量操作</el-button>
     </el-form>
     <el-divider/>
     <el-table :data="fileInfo" style="width: 100%" border :header-cell-style="{ textAlign: 'center' }">
@@ -188,6 +202,12 @@ async function handleRenameConfirm() {
         <el-button type="primary" @click="handleRenameConfirm">确认</el-button>
       </template>
     </el-dialog>
+
+    <BatchOperationDialog
+      v-model="batchDialogVisible"
+      :file-list="fileInfo"
+      @updated="handleBatchUpdated"
+    />
   </el-card>
 </template>
 
