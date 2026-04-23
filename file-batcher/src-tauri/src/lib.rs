@@ -4,6 +4,7 @@ mod commands;
 mod file_sys;
 
 use commands::button_commands::*;
+use commands::window_commands::*;
 use chrono::Local;
 use tauri::Manager;
 // #[cfg(target_os = "windows")]
@@ -48,6 +49,8 @@ pub fn run() {
             get_file_info_command,
             get_file_list_command,
             rename_file_command,
+            open_batch_window_command,
+            close_batch_window_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

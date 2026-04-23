@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import * as icons from "@element-plus/icons-vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
-import BatchOperationDialog from "../components/BatchOperationDialog.vue";
+import { emitTo, listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 type FileInfoRow = {
   fileName: string;
@@ -15,22 +15,78 @@ type FileInfoRow = {
   fileModifyTime: string;
 };
 
+const BATCH_WINDOW_LABEL = "batch";
+const EVENT_REQUEST_FILES = "batch:request-files";
+const EVENT_FILES = "batch:files";
+const EVENT_FILE_UPDATED = "batch:file-updated";
+const EVENT_FINISHED = "batch:finished";
+
 const fileInfo = ref<FileInfoRow[]>([]);
 const renameDialogVisible = ref(false);
 const renameFileName = ref("");
 const currentRenameRow = ref<FileInfoRow | null>(null);
-const batchDialogVisible = ref(false);
 
-function handleOpenBatchDialog() {
+const unlistens: UnlistenFn[] = [];
+
+onMounted(async () => {
+  // 子窗口挂载完成后请求文件列表：把当前 fileInfo 发送过去
+  const off1 = await listen(EVENT_REQUEST_FILES, async () => {
+    try {
+      await emitTo(BATCH_WINDOW_LABEL, EVENT_FILES, fileInfo.value);
+    } catch (e) {
+      console.error("emit files to batch window failed:", e);
+    }
+  });
+  unlistens.push(off1);
+
+  // 子窗口每完成一个文件更新，同步主窗口列表
+  const off2 = await listen<{
+    oldFileName: string;
+    oldFilePath?: string;
+    row: FileInfoRow;
+  }>(EVENT_FILE_UPDATED, (event) => {
+    const payload = event.payload;
+    if (!payload || !payload.row) return;
+    const target = fileInfo.value.find(
+      (r) => r.fileName === payload.oldFileName && (!payload.oldFilePath || r.filePath === payload.oldFilePath)
+    );
+    if (target) {
+      target.fileName = payload.row.fileName;
+      target.filePath = payload.row.filePath;
+      target.fileType = payload.row.fileType;
+      target.fileSize = payload.row.fileSize;
+      target.fileCreateTime = payload.row.fileCreateTime;
+      target.fileModifyTime = payload.row.fileModifyTime;
+    }
+  });
+  unlistens.push(off2);
+
+  const off3 = await listen<{ success: number; failed: number }>(EVENT_FINISHED, (event) => {
+    const { success, failed } = event.payload ?? { success: 0, failed: 0 };
+    if (failed === 0 && success > 0) {
+      ElMessage.success(`批量操作完成：成功 ${success} 个`);
+    }
+  });
+  unlistens.push(off3);
+});
+
+onBeforeUnmount(() => {
+  while (unlistens.length > 0) {
+    const off = unlistens.pop();
+    if (off) off();
+  }
+});
+
+async function handleOpenBatchDialog() {
   if (fileInfo.value.length === 0) {
     ElMessage.info("请先打开文件或文件夹");
     return;
   }
-  batchDialogVisible.value = true;
-}
-
-function handleBatchUpdated(_files: FileInfoRow[]) {
-  // 组件内已直接在原对象上更新字段，这里保留扩展点
+  try {
+    await invoke("open_batch_window_command");
+  } catch (e) {
+    ElMessage.error(`打开批量操作窗口失败：${String(e)}`);
+  }
 }
 
 async function handleOpenFile() {
@@ -203,11 +259,6 @@ async function handleRenameConfirm() {
       </template>
     </el-dialog>
 
-    <BatchOperationDialog
-      v-model="batchDialogVisible"
-      :file-list="fileInfo"
-      @updated="handleBatchUpdated"
-    />
   </el-card>
 </template>
 
