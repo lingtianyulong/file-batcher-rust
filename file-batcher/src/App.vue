@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { EditPen, Expand, Fold, Setting } from "@element-plus/icons-vue";
+import { EditPen, Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
 import BatchPage from "./pages/batch.vue";
@@ -54,7 +54,7 @@ function toggleSidebar() {
     </template>
     <template v-else>
       <el-container class="layout">
-        <el-aside :width="isCollapsed ? '64px' : '220px'" class="sidebar">
+        <el-aside :width="isCollapsed ? '64px' : '150px'" class="sidebar">
           <div class="sidebar-toggle">
             <el-button text class="sidebar-toggle-btn" @click="toggleSidebar">
               <el-icon>
@@ -70,8 +70,8 @@ function toggleSidebar() {
             @select="handleMenuSelect"
           >
             <el-menu-item index="rename">
-              <el-icon><EditPen /></el-icon>
-              <span>重命名</span>
+              <el-icon><HomeFilled /></el-icon>
+              <span>首页</span>
             </el-menu-item>
             <el-menu-item index="settings">
               <el-icon><Setting /></el-icon>
