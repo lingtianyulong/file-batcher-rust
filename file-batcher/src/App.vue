@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { EditPen, Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
+import { Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
 import BatchPage from "./pages/batch.vue";
@@ -71,11 +71,11 @@ function toggleSidebar() {
           >
             <el-menu-item index="rename">
               <el-icon><HomeFilled /></el-icon>
-              <span>首页</span>
+              <template #title>首页</template>
             </el-menu-item>
             <el-menu-item index="settings">
               <el-icon><Setting /></el-icon>
-              <span>设置</span>
+              <template #title>设置</template>
             </el-menu-item>
           </el-menu>
         </el-aside>
