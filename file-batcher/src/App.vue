@@ -81,8 +81,8 @@ function toggleSidebar() {
         </el-aside>
 
         <el-main class="content">
-          <RenamePage v-if="activeMenu === 'rename'" />
-          <el-card v-if="activeMenu === 'settings'" class="card" shadow="hover">
+          <RenamePage v-show="activeMenu === 'rename'" />
+          <el-card v-show="activeMenu === 'settings'" class="card" shadow="hover">
             <template #header>
               <div class="card-header">
                 <span>设置</span>

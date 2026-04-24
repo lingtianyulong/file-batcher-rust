@@ -16,6 +16,33 @@ pub struct FileInfo {
     pub file_modify_time: Option<String>,
 }
 
+fn format_file_size(size: u64) -> String {
+    std::cfg_select! {
+        target_os = "windows" => {
+            // 添加 MB、GB 的转换逻辑
+            if size >= 1024 * 1024 * 1024 {
+                let gb = (size as f64) / (1024_f64 * 1024_f64 * 1024_f64);
+                format!("{:.2} GB", gb)
+            } else if size >= 1024 * 1024 {
+                let mb = (size as f64) / (1024_f64 * 1024_f64);
+                format!("{:.2} MB", mb)
+            } else if size >= 1024 {
+                let kb = (size as f64) / 1024_f64;
+                format!("{:.2} KB", kb)
+            } else {
+                let kb = (size + 1023) / 1024;  // 向上取整
+                format!("{} KB", kb)
+            }
+        },
+        any(target_os = "linux", target_os = "macos") => {
+            format_size(size, BINARY)
+        },
+        _ => {
+            format!("{} B", size)
+        }
+    }
+}
+
 /**
  * 获取文件信息
  * @param file_path: &str
@@ -54,7 +81,7 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     };
 
     let file_size = match fs::metadata(path) {
-        Ok(metadata) => format_size(metadata.len(), BINARY),
+        Ok(metadata) => format_file_size(metadata.len()),
         Err(_) => {
             let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File size not found: {}", file_path));
             return Err(Box::new(error));
