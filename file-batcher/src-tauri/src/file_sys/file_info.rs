@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Local};
-use humansize::{format_size, BINARY};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
@@ -35,6 +34,7 @@ fn format_file_size(size: u64) -> String {
             }
         },
         any(target_os = "linux", target_os = "macos") => {
+            use humansize::{format_size, BINARY};
             format_size(size, BINARY)
         },
         _ => {
