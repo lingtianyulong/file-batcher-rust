@@ -42,6 +42,11 @@ function handleMenuSelect(index: string) {
 function toggleSidebar() {
   isCollapsed.value = !isCollapsed.value;
 }
+
+document.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+});
+
 </script>
 
 <template>

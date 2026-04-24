@@ -3,8 +3,10 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import * as icons from "@element-plus/icons-vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { openPath } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { join } from "@tauri-apps/api/path";
 
 type FileInfoRow = {
   fileName: string;
@@ -210,6 +212,40 @@ async function handleRenameConfirm() {
   }
 }
 
+const previewableFileTypes = new Set([
+  "txt",
+  "md",
+  "log",
+  "csv",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "pdf",
+  "ppt",
+  "pptx",
+]);
+
+async function handlePreview(row: FileInfoRow) {
+  if (!row.fileName || !row.filePath) {
+    ElMessage.warning("文件路径不完整，无法预览");
+    return;
+  }
+
+  try {
+    const fullPath = await join(row.filePath, row.fileName);
+    const fileType = (row.fileType ?? "").toLowerCase();
+
+    if (fileType && !previewableFileTypes.has(fileType)) {
+      ElMessage.info(`当前格式 ${fileType} 将尝试使用系统默认应用打开`);
+    }
+
+    await openPath(fullPath);
+  } catch (error) {
+    ElMessage.error(`预览失败：${String(error)}`);
+  }
+}
+
 
 </script>
 
@@ -237,7 +273,7 @@ async function handleRenameConfirm() {
       <el-table-column label="操作" align="center" width="200px" fixed="right">
         <template #default="scoped">
           <el-button link type="primary" :icon="icons.Edit" @click="handleRename(scoped.row)">重命名</el-button>
-          <el-button link type="danger" :icon="icons.Delete">删除</el-button>
+          <el-button link type="warning" :icon="icons.View" @click="handlePreview(scoped.row)">预览</el-button>
         </template>
       </el-table-column>
     </el-table>
