@@ -150,6 +150,45 @@ pub fn get_file_list(file_path: &str) -> Result<Vec<FileInfo>, Box<dyn std::erro
     Ok(file_list)
 }
 
+pub fn get_file_list_with_progress<F>(
+    file_path: &str,
+    mut on_progress: F,
+) -> Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>>
+where
+    F: FnMut(usize, usize, Option<String>),
+{
+    log::info!("get_file_list_with_progress: {}", file_path);
+    let path = Path::new(file_path);
+    if !path.exists() {
+        let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File not found: {}", file_path));
+        return Err(Box::new(error));
+    }
+
+    let entries = fs::read_dir(path)?.collect::<Result<Vec<_>, std::io::Error>>()?;
+    let total = entries.len();
+    if total == 0 {
+        on_progress(0, 0, None);
+        return Ok(Vec::new());
+    }
+
+    let mut file_list = Vec::new();
+    for (index, file) in entries.into_iter().enumerate() {
+        let file_path = file.path();
+        let file_name = file_path.file_name().map(|name| name.to_string_lossy().to_string());
+        let file_info = match get_file_info(&file_path.to_string_lossy()) {
+            Ok(file_info) => file_info,
+            Err(e) => {
+                log::error!("get file info failed, the error is {}", e.to_string());
+                on_progress(index + 1, total, file_name);
+                continue;
+            }
+        };
+        file_list.push(file_info);
+        on_progress(index + 1, total, file_name);
+    }
+    Ok(file_list)
+}
+
 /**
  * 重命名文件
  * @param file_dir: &str
