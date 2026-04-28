@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
 import BatchPage from "./pages/batch.vue";
 import TitleBar from "./components/TitleBar.vue";
+import {invoke} from "@tauri-apps/api/core";
 
 const activeMenu = ref("rename");
 const router = useRouter();
@@ -43,9 +44,22 @@ function toggleSidebar() {
   isCollapsed.value = !isCollapsed.value;
 }
 
-document.addEventListener("contextmenu", (event) => {
+const handleContextMenu = async (event: MouseEvent) => {
   event.preventDefault();
+  // await invoke("prevent_context_menu");
+  await invoke("show_contextmenu_command", { x: event.clientX, y: event.clientY });
+};
+
+onMounted(() => {
+  document.addEventListener("contextmenu", handleContextMenu);
 });
+
+onUnmounted(() => {
+  document.removeEventListener("contextmenu", handleContextMenu);
+});
+// document.addEventListener("contextmenu", (event) => {
+//   event.preventDefault();
+// });
 
 </script>
 
