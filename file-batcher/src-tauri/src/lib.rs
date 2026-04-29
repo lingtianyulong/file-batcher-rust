@@ -31,13 +31,6 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
-            #[cfg(target_os = "windows")]
-            {
-                // let _ = apply_acrylic(&window, Some((245, 247, 250, 100)));
-                // only windows 11
-                use window_vibrancy::apply_mica;
-                let _ = apply_mica(&window, Some(false));
-            }
             window.show().unwrap();
             Ok(())
         })

@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
 import RenamePage from "./pages/rename.vue";
-import BatchPage from "./pages/batch.vue";
+// import BatchPage from "./pages/batch.vue";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 
@@ -119,7 +119,7 @@ onUnmounted(() => {
 .page {
   height: 100vh;
   padding: 0;
-  background: transparent;
+  background: #ffffff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -131,8 +131,8 @@ onUnmounted(() => {
 }
 
 .sidebar {
-  border-right: 1px solid rgba(180, 190, 210, 0.7);
-  background: rgba(255, 255, 255, 0.62);
+  border-right: 1px solid #dcdfe6;
+  background: #ffffff;
   transition: width 0.2s ease;
   overflow: hidden;   /* 移除滚动条 */
 }
@@ -151,11 +151,11 @@ onUnmounted(() => {
 
 .menu {
   border-right: none;
-  --el-menu-bg-color: transparent;
+  --el-menu-bg-color: #ffffff;
   --el-menu-text-color: #2c3e50;
   --el-menu-active-color: #1a6fc4;
-  --el-menu-hover-bg-color: rgba(0, 0, 0, 0.08);
-  --el-menu-active-bg-color: rgba(26, 111, 196, 0.15);
+  --el-menu-hover-bg-color: #f5f7fa;
+  --el-menu-active-bg-color: #ecf5ff;
 }
 
 .content {
@@ -191,11 +191,11 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: transparent;
+  background: #ffffff;
 }
 
 .layout > .el-aside {
-  background: transparent !important;
+  background: #ffffff !important;
 }
 
 .layout > .el-aside .el-menu-item {

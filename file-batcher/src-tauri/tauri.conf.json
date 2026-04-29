@@ -17,7 +17,7 @@
         "height": 768,
         "visible": false,
         "decorations": false,
-        "transparent": true,
+        "transparent": false,
         "resizable": true
       }
     ],

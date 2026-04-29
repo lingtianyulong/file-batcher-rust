@@ -24,7 +24,7 @@ pub async fn open_batch_window_command(app: AppHandle) -> Result<(), String> {
     .inner_size(900.0, 700.0)
     .min_inner_size(640.0, 480.0)
     .decorations(false)
-    .transparent(true)
+    .transparent(false)
     .resizable(true)
     .center()
     .visible(false)
@@ -34,11 +34,12 @@ pub async fn open_batch_window_command(app: AppHandle) -> Result<(), String> {
         e.to_string()
     })?;
 
-    #[cfg(target_os = "windows")]
-    {
-        use window_vibrancy::apply_mica;
-        let _ = apply_mica(&window, Some(false));
-    }
+    // 已根据需求移除毛玻璃 / 半透明效果，保留下方代码以备恢复
+    // #[cfg(target_os = "windows")]
+    // {
+    //     use window_vibrancy::apply_mica;
+    //     let _ = apply_mica(&window, Some(false));
+    // }
 
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;

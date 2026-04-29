@@ -54,14 +54,14 @@ onMounted(async () => {
 
 <style scoped>
 .titlebar {
-  --titlebar-bg: rgba(255, 255, 255, 0.5);
+  --titlebar-bg: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 36px;
   padding: 0 0 0 16px;
   background: var(--titlebar-bg);
-  border-bottom: 1px solid rgba(228, 231, 237, 0.6);
+  border-bottom: 1px solid #e4e7ed;
   user-select: none;
   flex-shrink: 0;
 }
@@ -103,7 +103,7 @@ onMounted(async () => {
   width: 46px;
   height: 100%;
   border: none;
-  background: transparent;
+  background: #ffffff;
   color: #606266;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -112,7 +112,7 @@ onMounted(async () => {
 }
 
 .titlebar-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: #f5f7fa;
   color: #303133;
 }
 
