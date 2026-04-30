@@ -25,6 +25,7 @@
       ]
     },
     "dialog:allow-open",
-    "log:default"
+    "log:default",
+    "dialog:default"
   ]
 }

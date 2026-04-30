@@ -7,6 +7,7 @@ import { openPath } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { join } from "@tauri-apps/api/path";
+import { message } from "@tauri-apps/plugin-dialog";
 
 type FileInfoRow = {
   fileName: string;
@@ -125,7 +126,7 @@ async function handleOpenFile() {
   });
 
   if (!file_path || Array.isArray(file_path)) {
-    ElMessage.info("未选择单个文件.");
+    await message("未选择单个文件.", {title: "提示", kind: "info"});
     return;
   }
 
