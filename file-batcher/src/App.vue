@@ -1,40 +1,42 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted, withDirectives } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
 import "element-plus/dist/index.css";
-import RenamePage from "./pages/rename.vue";
-// import BatchPage from "./pages/batch.vue";
+import HomePage from "./pages/home.vue";
+import BatchPage from "./pages/batch.vue";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
+import { hide } from "@tauri-apps/api/app";
+import LoginBar from "./components/LoginBar.vue";
 
-const activeMenu = ref("rename");
+const activeMenu = ref("home");
 const router = useRouter();
 const route = useRoute();
 const isCollapsed = ref(false);
 
-const isBatchWindow = computed(() => route.path === "/batch");
+// const isBatchWindow = computed(() => route.path === "/batch");
 
 const menuRouteMap: Record<string, string> = {
-  rename: "/rename",
+  rename: "/home",
   settings: "/settings",
 };
 
 const routeMenuMap: Record<string, string> = {
-  "/rename": "rename",
+  "/home": "home",
   "/settings": "settings",
 };
 
 watch(
   () => route.path,
   (path) => {
-    activeMenu.value = routeMenuMap[path] ?? "rename";
+    activeMenu.value = routeMenuMap[path] ?? "home";
   },
   { immediate: true },
 );
 
 function handleMenuSelect(index: string) {
-  const targetPath = menuRouteMap[index] ?? "/rename";
+  const targetPath = menuRouteMap[index] ?? "/home";
   if (targetPath !== route.path) {
     void router.push(targetPath);
   }
@@ -57,16 +59,21 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("contextmenu", handleContextMenu);
 });
-// document.addEventListener("contextmenu", (event) => {
-//   event.preventDefault();
-// });
 
 </script>
 
 <template>
   <main class="page">
     <TitleBar />
-    <template v-if="isBatchWindow">
+    <LoginBar />
+  </main>
+  <!-- <main class="page">
+    <TitleBar />
+    <div :style="{width: '100%', height: '20px', color: 'red', paddingRight: '20px',
+          display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}">
+      aaa
+    </div> -->
+    <!-- <template v-if="isBatchWindow">
       <div class="batch-window-content">
         <BatchPage />
       </div>
@@ -88,7 +95,7 @@ onUnmounted(() => {
             class="menu"
             @select="handleMenuSelect"
           >
-            <el-menu-item index="rename">
+            <el-menu-item index="home">
               <el-icon><HomeFilled /></el-icon>
               <template #title>首页</template>
             </el-menu-item>
@@ -100,7 +107,7 @@ onUnmounted(() => {
         </el-aside>
 
         <el-main class="content">
-          <RenamePage v-show="activeMenu === 'rename'" />
+          <HomePage v-show="activeMenu === 'home'" />
           <el-card v-show="activeMenu === 'settings'" class="card" shadow="hover">
             <template #header>
               <div class="card-header">
@@ -111,8 +118,8 @@ onUnmounted(() => {
           </el-card>
         </el-main>
       </el-container>
-    </template>
-  </main>
+    </template> -->
+  <!-- </main> -->
 </template>
 
 <style scoped>

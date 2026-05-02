@@ -18,6 +18,7 @@ pub fn run() {
         let formatted = now.format("%Y-%m-%d %H:%M:%S%.3f").to_string();
         out.finish(format_args!("{} [{}] - {}", formatted, record.level(), message));
     })
+    .clear_targets()
     .target(
         tauri_plugin_log::Target::new(
             tauri_plugin_log::TargetKind::Folder {
