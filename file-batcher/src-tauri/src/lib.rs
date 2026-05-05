@@ -50,7 +50,6 @@ pub fn run() {
         }
         let db_url = format!("sqlite:{}", db_path.to_string_lossy().replace('\\', "/"));
 
-
         tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::new().build())
         .setup(|app| {
