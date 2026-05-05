@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileInfo {
@@ -52,14 +51,20 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     log::info!("get_file_info: {}", file_path);
     let path = Path::new(file_path);
     if !path.exists() {
-        let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File not found: {}", file_path));
+        let error = std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("File not found: {}", file_path),
+        );
         return Err(Box::new(error));
     }
 
     let file_name = match path.file_name() {
         Some(file_name) => file_name.to_string_lossy().to_string(),
         None => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File name not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File name not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -67,7 +72,10 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     let file_path = match path.parent() {
         Some(file_path) => file_path.to_string_lossy().to_string(),
         None => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File path not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File path not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -75,7 +83,10 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     let file_type = match path.extension() {
         Some(file_type) => file_type.to_string_lossy().to_string(),
         None => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File type not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File type not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -83,7 +94,10 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     let file_size = match fs::metadata(path) {
         Ok(metadata) => format_file_size(metadata.len()),
         Err(_) => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File size not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File size not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -95,7 +109,10 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
             create_time.format("%Y-%m-%d %H:%M:%S").to_string()
         }
         Err(_) => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File create time not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File create time not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -106,7 +123,10 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
             modify_time.format("%Y-%m-%d %H:%M:%S").to_string()
         }
         Err(_) => {
-            let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File modify time not found: {}", file_path));
+            let error = std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File modify time not found: {}", file_path),
+            );
             return Err(Box::new(error));
         }
     };
@@ -126,11 +146,16 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
  * @param file_path: &str
  * @return: Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>>
  */
-pub fn get_file_list(file_path: &str) -> Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>> {
+pub fn get_file_list(
+    file_path: &str,
+) -> Result<Vec<FileInfo>, Box<dyn std::error::Error + 'static>> {
     log::info!("get_file_list: {}", file_path);
     let path = Path::new(file_path);
     if !path.exists() {
-        let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File not found: {}", file_path));
+        let error = std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("File not found: {}", file_path),
+        );
         return Err(Box::new(error));
     }
     let files = fs::read_dir(path)?;
@@ -160,7 +185,10 @@ where
     log::info!("get_file_list_with_progress: {}", file_path);
     let path = Path::new(file_path);
     if !path.exists() {
-        let error = std::io::Error::new(std::io::ErrorKind::NotFound, format!("File not found: {}", file_path));
+        let error = std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("File not found: {}", file_path),
+        );
         return Err(Box::new(error));
     }
 
@@ -174,7 +202,9 @@ where
     let mut file_list = Vec::new();
     for (index, file) in entries.into_iter().enumerate() {
         let file_path = file.path();
-        let file_name = file_path.file_name().map(|name| name.to_string_lossy().to_string());
+        let file_name = file_path
+            .file_name()
+            .map(|name| name.to_string_lossy().to_string());
         let file_info = match get_file_info(&file_path.to_string_lossy()) {
             Ok(file_info) => file_info,
             Err(e) => {
@@ -218,7 +248,7 @@ pub fn rename_file(
     if !old_file_path.exists() {
         let error = std::io::Error::new(
             std::io::ErrorKind::NotFound,
-            format!("File not found: {}", old_file_path.to_string_lossy())
+            format!("File not found: {}", old_file_path.to_string_lossy()),
         );
         return Err(Box::new(error));
     }
@@ -227,7 +257,7 @@ pub fn rename_file(
     if new_file_path.exists() {
         let error = std::io::Error::new(
             std::io::ErrorKind::AlreadyExists,
-            format!("File already exists: {}", new_file_path.to_string_lossy())
+            format!("File already exists: {}", new_file_path.to_string_lossy()),
         );
         return Err(Box::new(error));
     }

@@ -1,5 +1,7 @@
 // 按钮命令
-use crate::file_sys::file_info::{ get_file_info, get_file_list, get_file_list_with_progress, rename_file };
+use crate::file_sys::file_info::{
+    get_file_info, get_file_list, get_file_list_with_progress, rename_file,
+};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
@@ -62,7 +64,11 @@ pub fn get_file_info_command(file_path: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn get_file_list_command(app: AppHandle, file_path: &str, request_id: Option<String>) -> Result<String, String> {
+pub fn get_file_list_command(
+    app: AppHandle,
+    file_path: &str,
+    request_id: Option<String>,
+) -> Result<String, String> {
     log::info!("get_file_list_command, the file path is {}", file_path);
     let request_id = request_id.unwrap_or_default();
     let file_list_result = if request_id.is_empty() {
@@ -94,7 +100,11 @@ pub fn get_file_list_command(app: AppHandle, file_path: &str, request_id: Option
 }
 
 #[tauri::command]
-pub fn rename_file_command(file_dir: &str, old_file_name: &str, new_file_name: &str) -> Result<String, String> {
+pub fn rename_file_command(
+    file_dir: &str,
+    old_file_name: &str,
+    new_file_name: &str,
+) -> Result<String, String> {
     log::info!(
         "rename_file_command, file_dir is {}, old_file_name is {}, new_file_name is {}",
         file_dir,
@@ -112,7 +122,10 @@ pub fn rename_file_command(file_dir: &str, old_file_name: &str, new_file_name: &
     let json = match serde_json::to_string(&file_info) {
         Ok(json) => json,
         Err(e) => {
-            log::error!("convert renamed file info to json failed, the error is {}", e);
+            log::error!(
+                "convert renamed file info to json failed, the error is {}",
+                e
+            );
             return Err(e.to_string());
         }
     };

@@ -15,24 +15,21 @@ pub async fn open_batch_window_command(app: AppHandle) -> Result<(), String> {
         return Ok(());
     }
 
-    let window = WebviewWindowBuilder::new(
-        &app,
-        "batch",
-        WebviewUrl::App("index.html#/batch".into()),
-    )
-    .title("批量操作")
-    .inner_size(900.0, 700.0)
-    .min_inner_size(640.0, 480.0)
-    .decorations(false)
-    .transparent(false)
-    .resizable(true)
-    .center()
-    .visible(false)
-    .build()
-    .map_err(|e| {
-        log::error!("failed to build batch window: {}", e);
-        e.to_string()
-    })?;
+    let window =
+        WebviewWindowBuilder::new(&app, "batch", WebviewUrl::App("index.html#/batch".into()))
+            .title("批量操作")
+            .inner_size(900.0, 700.0)
+            .min_inner_size(640.0, 480.0)
+            .decorations(false)
+            .transparent(false)
+            .resizable(true)
+            .center()
+            .visible(false)
+            .build()
+            .map_err(|e| {
+                log::error!("failed to build batch window: {}", e);
+                e.to_string()
+            })?;
 
     // 已根据需求移除毛玻璃 / 半透明效果，保留下方代码以备恢复
     // #[cfg(target_os = "windows")]
