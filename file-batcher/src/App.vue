@@ -1,26 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted, withDirectives } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { Expand, Fold, HomeFilled, Setting } from "@element-plus/icons-vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import "element-plus/dist/index.css";
-import HomePage from "./pages/home.vue";
-import BatchPage from "./pages/batch.vue";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
-import { hide } from "@tauri-apps/api/app";
 import LoginBar from "./components/LoginBar.vue";
 
 const activeMenu = ref("home");
-const router = useRouter();
 const route = useRoute();
-const isCollapsed = ref(false);
-
-// const isBatchWindow = computed(() => route.path === "/batch");
-
-const menuRouteMap: Record<string, string> = {
-  rename: "/home",
-  settings: "/settings",
-};
 
 const routeMenuMap: Record<string, string> = {
   "/home": "home",
@@ -35,16 +22,6 @@ watch(
   { immediate: true },
 );
 
-function handleMenuSelect(index: string) {
-  const targetPath = menuRouteMap[index] ?? "/home";
-  if (targetPath !== route.path) {
-    void router.push(targetPath);
-  }
-}
-
-function toggleSidebar() {
-  isCollapsed.value = !isCollapsed.value;
-}
 
 const handleContextMenu = async (event: MouseEvent) => {
   event.preventDefault();
