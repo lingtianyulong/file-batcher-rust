@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { CloseBold, Lock, User } from "@element-plus/icons-vue";
+import { invoke } from "@tauri-apps/api/core";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -15,6 +16,7 @@ const loginForm = ref({
   username: "",
   password: "",
 });
+const loginError = ref("");
 
 const visible = computed({
   get: () => props.modelValue,
@@ -26,11 +28,21 @@ function closeDialog() {
 }
 
 function handleLogin() {
+  loginError.value = "";
   if (!loginForm.value.username || !loginForm.value.password) {
+    loginError.value = "请输入账号和密码";
     return;
   }
-  emit("login-success");
-  closeDialog();
+  invoke("login_command", { username: loginForm.value.username, password: loginForm.value.password })
+  .then((result) => {
+    console.log("login success", result);
+    emit("login-success");
+    closeDialog();
+  })
+  .catch((error) => {
+    console.error("login failed, the reason is {}", error);
+    loginError.value = error;
+  });
 }
 </script>
 
@@ -64,6 +76,7 @@ function handleLogin() {
           </el-input>
         </el-form-item>
       </el-form>
+      <div v-if="loginError" class="login-error-tip">{{ loginError }}</div>
 
       <el-button class="login-submit" type="primary" @click="handleLogin">登录</el-button>
       <div class="login-links">
@@ -157,6 +170,14 @@ function handleLogin() {
   height: 42px;
   font-size: 15px;
   border-radius: 8px;
+}
+
+.login-error-tip {
+  margin: -4px 0 10px;
+  min-height: 20px;
+  color: #f56c6c;
+  font-size: 13px;
+  line-height: 20px;
 }
 
 :deep(.login-dialog .el-dialog) {

@@ -2,12 +2,14 @@
 
 mod commands;
 mod file_sys;
+mod login;
 
 use commands::button_commands::*;
 use commands::window_commands::*;
 use commands::contextmenu_commands::*;
 use chrono::Local;
 use tauri::Manager;
+use login::commands::login_command;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -45,6 +47,7 @@ pub fn run() {
             open_batch_window_command,
             close_batch_window_command,
             show_contextmenu_command,
+            login_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
