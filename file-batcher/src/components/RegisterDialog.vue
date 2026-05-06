@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { CloseBold, Lock, User } from "@element-plus/icons-vue";
-import { invoke } from "@tauri-apps/api/core";
-import RegisterDialog from "./RegisterDialog.vue";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -10,15 +8,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
-  (e: "login-success"): void;
 }>();
 
-const loginForm = ref({
+const registerForm = ref({
   username: "",
   password: "",
+  confirmPassword: "",
 });
-const loginError = ref("");
-const registerDialogVisible = ref(false);
+const registerError = ref("");
 
 const visible = computed({
   get: () => props.modelValue,
@@ -29,40 +26,31 @@ function closeDialog() {
   visible.value = false;
 }
 
-function openRegisterDialog() {
-  registerDialogVisible.value = true;
-}
-
-function handleLogin() {
-  loginError.value = "";
-  if (!loginForm.value.username || !loginForm.value.password) {
-    loginError.value = "请输入账号和密码";
+function handleRegister() {
+  registerError.value = "";
+  if (!registerForm.value.username || !registerForm.value.password || !registerForm.value.confirmPassword) {
+    registerError.value = "请完整填写注册信息";
     return;
   }
-  invoke("login_command", { username: loginForm.value.username, password: loginForm.value.password })
-  .then((result) => {
-    console.log("login success", result);
-    emit("login-success");
-    closeDialog();
-  })
-  .catch((error) => {
-    console.error("login failed, the reason is {}", error);
-    loginError.value = error;
-  });
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    registerError.value = "两次输入的密码不一致";
+    return;
+  }
+  closeDialog();
 }
 </script>
 
 <template>
-  <el-dialog v-model="visible" width="420px" :show-close="false" align-center class="login-dialog">
-    <el-button class="login-close-btn" :icon="CloseBold" @click="closeDialog" />
-    <div class="login-panel">
-      <div class="login-avatar">Q</div>
-      <div class="login-title">账号登录</div>
-      <div class="login-subtitle">欢迎使用 FileBatcher</div>
+  <el-dialog v-model="visible" width="420px" :show-close="false" align-center class="register-dialog">
+    <el-button class="register-close-btn" :icon="CloseBold" @click="closeDialog" />
+    <div class="register-panel">
+      <div class="register-avatar">R</div>
+      <div class="register-title">注册账号</div>
+      <div class="register-subtitle">创建你的 FileBatcher 账号</div>
 
-      <el-form label-position="top" class="login-form">
+      <el-form label-position="top" class="register-form">
         <el-form-item>
-          <el-input v-model="loginForm.username" placeholder="QQ号 / 邮箱 / 手机号" clearable size="large">
+          <el-input v-model="registerForm.username" placeholder="请输入账号" clearable size="large">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
@@ -70,7 +58,7 @@ function handleLogin() {
         </el-form-item>
         <el-form-item>
           <el-input
-            v-model="loginForm.password"
+            v-model="registerForm.password"
             type="password"
             show-password
             placeholder="请输入密码"
@@ -81,29 +69,35 @@ function handleLogin() {
             </template>
           </el-input>
         </el-form-item>
+        <el-form-item>
+          <el-input
+            v-model="registerForm.confirmPassword"
+            type="password"
+            show-password
+            placeholder="请再次输入密码"
+            size="large"
+          >
+            <template #prefix>
+              <el-icon><Lock /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
       </el-form>
-      <div v-if="loginError" class="login-error-tip">{{ loginError }}</div>
 
-      <el-button class="login-submit" type="primary" @click="handleLogin">登录</el-button>
-      <div class="login-links">
-        <el-button text @click="openRegisterDialog">注册账号</el-button>
-        <span class="login-link-divider">|</span>
-        <el-button text>忘记密码</el-button>
-      </div>
+      <div v-if="registerError" class="register-error-tip">{{ registerError }}</div>
 
-
+      <el-button class="register-submit" type="primary" @click="handleRegister">注册</el-button>
     </div>
   </el-dialog>
-  <RegisterDialog v-model="registerDialogVisible" />
 </template>
 
 <style scoped>
-.login-panel {
+.register-panel {
   position: relative;
   padding: 6px 18px 10px;
 }
 
-.login-close-btn {
+.register-close-btn {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -120,12 +114,12 @@ function handleLogin() {
   --el-button-hover-border-color: #e81123;
 }
 
-:deep(.login-close-btn:hover) {
+:deep(.register-close-btn:hover) {
   background-color: #e81123;
   color: #fff;
 }
 
-.login-avatar {
+.register-avatar {
   width: 72px;
   height: 72px;
   margin: 2px auto 14px;
@@ -140,14 +134,14 @@ function handleLogin() {
   box-shadow: 0 6px 18px rgba(22, 119, 255, 0.28);
 }
 
-.login-title {
+.register-title {
   text-align: center;
   font-size: 20px;
   font-weight: 600;
   color: #1f2d3d;
 }
 
-.login-subtitle {
+.register-subtitle {
   margin-top: 4px;
   margin-bottom: 16px;
   text-align: center;
@@ -155,31 +149,18 @@ function handleLogin() {
   color: #7c8a9b;
 }
 
-.login-form {
+.register-form {
   margin-top: 2px;
 }
 
-.login-links {
-  margin: 4px 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #7c8a9b;
-}
-
-.login-link-divider {
-  margin: 0 4px;
-  color: #c0c4cc;
-}
-
-.login-submit {
+.register-submit {
   width: 100%;
   height: 42px;
   font-size: 15px;
   border-radius: 8px;
 }
 
-.login-error-tip {
+.register-error-tip {
   margin: -4px 0 10px;
   min-height: 20px;
   color: #f56c6c;
@@ -187,20 +168,16 @@ function handleLogin() {
   line-height: 20px;
 }
 
-:deep(.login-dialog .el-dialog) {
+:deep(.register-dialog .el-dialog) {
   border-radius: 14px;
   overflow: hidden;
 }
 
-:deep(.login-dialog .el-dialog__body) {
+:deep(.register-dialog .el-dialog__body) {
   padding: 14px 24px 18px;
 }
 
-:deep(.login-form .el-input__wrapper) {
+:deep(.register-form .el-input__wrapper) {
   border-radius: 8px;
-}
-
-:deep(.login-links .el-button.is-text) {
-  color: #4d8dff;
 }
 </style>
