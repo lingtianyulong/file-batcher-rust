@@ -23,14 +23,19 @@ pub fn register_command(username: String, password: String) -> Result<String, St
 
     match SqliteConnection::connect(db_file.as_str()) {
         Ok(db) => {
-            let result = db.execute("INSERT INTO users (id, username, password, create_time, update_time) VALUES (?, ?, ?, ?, ?)", (user.id, user.username, user.password, user.create_time, user.update_time)).unwrap();
+            let result = db
+                .execute(
+                    "INSERT INTO users (id, username, password, create_time, update_time) VALUES (?, ?, ?, ?, ?)",
+                    (user.id, user.username, user.password, user.create_time, user.update_time),
+                )
+                .map_err(|e| e.to_string())?;
             if result == 0 {
-                return Err(String::from("register failed"));
+                return Err("register failed".to_string());
             }
+            Ok("register success".to_string())
         }
         Err(e) => {
             return Err(e.to_string());
         }
     }
-    Ok(String::from("register success"))
 }
