@@ -1,13 +1,16 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
+mod common;
 mod commands;
 mod file_sys;
 mod login;
+mod register;
 
 use chrono::Local;
 use commands::button_commands::*;
 use commands::contextmenu_commands::*;
 use commands::window_commands::*;
+use register::*;
 use login::commands::login_command;
 use std::fs::File;
 use tauri::Manager;
@@ -69,6 +72,7 @@ pub fn run() {
             close_batch_window_command,
             show_contextmenu_command,
             login_command,
+            register_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

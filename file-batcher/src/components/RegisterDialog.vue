@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { CloseBold, Lock, User } from "@element-plus/icons-vue";
+import { invoke } from "@tauri-apps/api/core";
+import { ElMessage } from "element-plus";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -36,6 +38,17 @@ function handleRegister() {
     registerError.value = "两次输入的密码不一致";
     return;
   }
+  invoke("register_command", { username: registerForm.value.username, password: registerForm.value.password })
+  .then((result) => {
+    console.log("register success", result);
+    ElMessage.success("注册成功");
+    closeDialog();
+  })
+  .catch((error) => {
+    console.error("register failed, the reason is {}", error);
+    ElMessage.error("注册失败，请检查账号和密码");
+    registerError.value = error;
+  });
   closeDialog();
 }
 </script>
