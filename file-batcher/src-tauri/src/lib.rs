@@ -12,6 +12,7 @@ use commands::contextmenu_commands::*;
 use commands::window_commands::*;
 use register::*;
 use login::commands::login_command;
+use rusqlite::Connection as RawSqliteConnection;
 use std::fs::File;
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
@@ -43,7 +44,15 @@ pub fn run() {
         let migration = Migration{
             version: 1,
             description: "Initial migration",
-            sql: "CREATE TABLE users (id INTEGER PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL)",
+            sql: concat!(
+                "CREATE TABLE users (",
+                "id TEXT PRIMARY KEY NOT NULL, ",
+                "username TEXT NOT NULL, ",
+                "password TEXT NOT NULL, ",
+                "create_time TEXT, ",
+                "update_time TEXT",
+                ")"
+            ),
             kind: MigrationKind::Up,
         };
 
@@ -51,6 +60,7 @@ pub fn run() {
         if !db_path.exists() {
             File::create(&db_path).expect("failed to create sqlite database file");
         }
+        ensure_users_table(&db_path);
         let db_url = format!("sqlite:{}", db_path.to_string_lossy().replace('\\', "/"));
 
         tauri::Builder::default()
@@ -76,4 +86,14 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn ensure_users_table(db_path: &std::path::Path) {
+    let conn = RawSqliteConnection::open(db_path)
+        .expect("failed to open sqlite database for table initialization");
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL, create_time TEXT, update_time TEXT)",
+        [],
+    )
+    .expect("failed to ensure users table exists");
 }
