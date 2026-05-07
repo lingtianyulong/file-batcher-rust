@@ -5,6 +5,7 @@ import "element-plus/dist/index.css";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 import LoginBar from "./components/LoginBar.vue";
+import MainPage from "./pages/MainPage.vue";
 
 const activeMenu = ref("home");
 const route = useRoute();
@@ -43,60 +44,8 @@ onUnmounted(() => {
   <main class="page">
     <TitleBar />
     <LoginBar />
+    <MainPage />
   </main>
-  <!-- <main class="page">
-    <TitleBar />
-    <div :style="{width: '100%', height: '20px', color: 'red', paddingRight: '20px',
-          display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}">
-      aaa
-    </div> -->
-    <!-- <template v-if="isBatchWindow">
-      <div class="batch-window-content">
-        <BatchPage />
-      </div>
-    </template>
-    <template v-else>
-      <el-container class="layout">
-        <el-aside :width="isCollapsed ? '64px' : '150px'" class="sidebar">
-          <div class="sidebar-toggle">
-            <el-button text class="sidebar-toggle-btn" @click="toggleSidebar">
-              <el-icon>
-                <Expand v-if="isCollapsed" />
-                <Fold v-else />
-              </el-icon>
-            </el-button>
-          </div>
-          <el-menu
-            :default-active="activeMenu"
-            :collapse="isCollapsed"
-            class="menu"
-            @select="handleMenuSelect"
-          >
-            <el-menu-item index="home">
-              <el-icon><HomeFilled /></el-icon>
-              <template #title>首页</template>
-            </el-menu-item>
-            <el-menu-item index="settings">
-              <el-icon><Setting /></el-icon>
-              <template #title>设置</template>
-            </el-menu-item>
-          </el-menu>
-        </el-aside>
-
-        <el-main class="content">
-          <HomePage v-show="activeMenu === 'home'" />
-          <el-card v-show="activeMenu === 'settings'" class="card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <span>设置</span>
-              </div>
-            </template>
-            <el-empty description="设置功能开发中" />
-          </el-card>
-        </el-main>
-      </el-container>
-    </template> -->
-  <!-- </main> -->
 </template>
 
 <style scoped>
