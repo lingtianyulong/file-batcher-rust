@@ -5,6 +5,7 @@ import "element-plus/dist/index.css";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 import LoginBar from "./components/LoginBar.vue";
+import HomePage from "./pages/home.vue";
 
 const activeMenu = ref("home");
 const route = useRoute();
@@ -12,6 +13,75 @@ const route = useRoute();
 const routeMenuMap: Record<string, string> = {
   "/home": "home",
   "/settings": "settings",
+};
+
+const MIN_ASIDE_WIDTH = 120;
+const MAX_ASIDE_WIDTH = 420;
+const leftAsideWidth = ref(200);
+const rightAsideWidth = ref(200);
+const isAsideResizing = ref(false);
+let stopAsideResize: (() => void) | undefined;
+let resizeAnimationFrame = 0;
+
+const clampAsideWidth = (width: number) => {
+  return Math.min(MAX_ASIDE_WIDTH, Math.max(MIN_ASIDE_WIDTH, width));
+};
+
+const startAsideResize = (side: "left" | "right", event: MouseEvent) => {
+  event.preventDefault();
+
+  const startX = event.clientX;
+  const startWidth = side === "left" ? leftAsideWidth.value : rightAsideWidth.value;
+  const previousCursor = document.body.style.cursor;
+  const previousUserSelect = document.body.style.userSelect;
+  let latestWidth = startWidth;
+
+  isAsideResizing.value = true;
+  document.body.style.cursor = "col-resize";
+  document.body.style.userSelect = "none";
+
+  const applyLatestWidth = () => {
+    const width = clampAsideWidth(latestWidth);
+
+    if (side === "left") {
+      leftAsideWidth.value = width;
+    } else {
+      rightAsideWidth.value = width;
+    }
+  };
+
+  const handleMouseMove = (moveEvent: MouseEvent) => {
+    const deltaX = moveEvent.clientX - startX;
+    latestWidth = side === "left" ? startWidth + deltaX : startWidth - deltaX;
+
+    if (resizeAnimationFrame) {
+      return;
+    }
+
+    resizeAnimationFrame = window.requestAnimationFrame(() => {
+      resizeAnimationFrame = 0;
+      applyLatestWidth();
+    });
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+    if (resizeAnimationFrame) {
+      window.cancelAnimationFrame(resizeAnimationFrame);
+      resizeAnimationFrame = 0;
+      applyLatestWidth();
+    }
+    isAsideResizing.value = false;
+    document.body.style.cursor = previousCursor;
+    document.body.style.userSelect = previousUserSelect;
+    stopAsideResize = undefined;
+  };
+
+  stopAsideResize?.();
+  stopAsideResize = handleMouseUp;
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", handleMouseUp);
 };
 
 watch(
@@ -35,6 +105,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener("contextmenu", handleContextMenu);
+  stopAsideResize?.();
 });
 
 </script>
@@ -43,60 +114,20 @@ onUnmounted(() => {
   <main class="page">
     <TitleBar />
     <LoginBar />
+    <el-container>
+      <el-aside class="sidebar-left" :class="{ 'is-resizing': isAsideResizing }" :width="`${leftAsideWidth}px`">
+        <div class="sidebar-toggle">ASide Left</div>
+        <div class="aside-resize-handle aside-resize-handle-right" @mousedown="startAsideResize('left', $event)" />
+      </el-aside>
+      <el-main class="content">
+        <HomePage />
+      </el-main>
+      <el-aside class="sidebar-rigth" :class="{ 'is-resizing': isAsideResizing }" :width="`${rightAsideWidth}px`">
+        <div class="aside-resize-handle aside-resize-handle-left" @mousedown="startAsideResize('right', $event)" />
+        <div class="sidebar-toggle">ASide Right</div>
+      </el-aside>
+    </el-container>
   </main>
-  <!-- <main class="page">
-    <TitleBar />
-    <div :style="{width: '100%', height: '20px', color: 'red', paddingRight: '20px',
-          display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}">
-      aaa
-    </div> -->
-    <!-- <template v-if="isBatchWindow">
-      <div class="batch-window-content">
-        <BatchPage />
-      </div>
-    </template>
-    <template v-else>
-      <el-container class="layout">
-        <el-aside :width="isCollapsed ? '64px' : '150px'" class="sidebar">
-          <div class="sidebar-toggle">
-            <el-button text class="sidebar-toggle-btn" @click="toggleSidebar">
-              <el-icon>
-                <Expand v-if="isCollapsed" />
-                <Fold v-else />
-              </el-icon>
-            </el-button>
-          </div>
-          <el-menu
-            :default-active="activeMenu"
-            :collapse="isCollapsed"
-            class="menu"
-            @select="handleMenuSelect"
-          >
-            <el-menu-item index="home">
-              <el-icon><HomeFilled /></el-icon>
-              <template #title>首页</template>
-            </el-menu-item>
-            <el-menu-item index="settings">
-              <el-icon><Setting /></el-icon>
-              <template #title>设置</template>
-            </el-menu-item>
-          </el-menu>
-        </el-aside>
-
-        <el-main class="content">
-          <HomePage v-show="activeMenu === 'home'" />
-          <el-card v-show="activeMenu === 'settings'" class="card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <span>设置</span>
-              </div>
-            </template>
-            <el-empty description="设置功能开发中" />
-          </el-card>
-        </el-main>
-      </el-container>
-    </template> -->
-  <!-- </main> -->
 </template>
 
 <style scoped>
@@ -114,11 +145,44 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.sidebar {
+.sidebar-left {
+  position: relative;
+  flex-shrink: 0;
   border-right: 1px solid #dcdfe6;
   background: #ffffff;
   transition: width 0.2s ease;
   overflow: hidden;   /* 移除滚动条 */
+}
+
+.sidebar-rigth {
+  position: relative;
+  flex-shrink: 0;
+  border-left: 1px solid #dcdfe6;
+  background: #ffffff;
+  transition: width 0.2s ease;
+  overflow: hidden;   /* 移除滚动条 */
+}
+
+.sidebar-left.is-resizing,
+.sidebar-rigth.is-resizing {
+  transition: none;
+}
+
+.aside-resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.aside-resize-handle-left {
+  left: -3px;
+}
+
+.aside-resize-handle-right {
+  right: -3px;
 }
 
 .sidebar-toggle {
