@@ -5,7 +5,7 @@ import "element-plus/dist/index.css";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 import LoginBar from "./components/LoginBar.vue";
-import HomePage from "./pages/home.vue";
+import MainPage from "./pages/MainPage.vue";
 
 const activeMenu = ref("home");
 const route = useRoute();
@@ -13,75 +13,6 @@ const route = useRoute();
 const routeMenuMap: Record<string, string> = {
   "/home": "home",
   "/settings": "settings",
-};
-
-const MIN_ASIDE_WIDTH = 120;
-const MAX_ASIDE_WIDTH = 420;
-const leftAsideWidth = ref(200);
-const rightAsideWidth = ref(200);
-const isAsideResizing = ref(false);
-let stopAsideResize: (() => void) | undefined;
-let resizeAnimationFrame = 0;
-
-const clampAsideWidth = (width: number) => {
-  return Math.min(MAX_ASIDE_WIDTH, Math.max(MIN_ASIDE_WIDTH, width));
-};
-
-const startAsideResize = (side: "left" | "right", event: MouseEvent) => {
-  event.preventDefault();
-
-  const startX = event.clientX;
-  const startWidth = side === "left" ? leftAsideWidth.value : rightAsideWidth.value;
-  const previousCursor = document.body.style.cursor;
-  const previousUserSelect = document.body.style.userSelect;
-  let latestWidth = startWidth;
-
-  isAsideResizing.value = true;
-  document.body.style.cursor = "col-resize";
-  document.body.style.userSelect = "none";
-
-  const applyLatestWidth = () => {
-    const width = clampAsideWidth(latestWidth);
-
-    if (side === "left") {
-      leftAsideWidth.value = width;
-    } else {
-      rightAsideWidth.value = width;
-    }
-  };
-
-  const handleMouseMove = (moveEvent: MouseEvent) => {
-    const deltaX = moveEvent.clientX - startX;
-    latestWidth = side === "left" ? startWidth + deltaX : startWidth - deltaX;
-
-    if (resizeAnimationFrame) {
-      return;
-    }
-
-    resizeAnimationFrame = window.requestAnimationFrame(() => {
-      resizeAnimationFrame = 0;
-      applyLatestWidth();
-    });
-  };
-
-  const handleMouseUp = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-    if (resizeAnimationFrame) {
-      window.cancelAnimationFrame(resizeAnimationFrame);
-      resizeAnimationFrame = 0;
-      applyLatestWidth();
-    }
-    isAsideResizing.value = false;
-    document.body.style.cursor = previousCursor;
-    document.body.style.userSelect = previousUserSelect;
-    stopAsideResize = undefined;
-  };
-
-  stopAsideResize?.();
-  stopAsideResize = handleMouseUp;
-  document.addEventListener("mousemove", handleMouseMove);
-  document.addEventListener("mouseup", handleMouseUp);
 };
 
 watch(
@@ -114,19 +45,7 @@ onUnmounted(() => {
   <main class="page">
     <TitleBar />
     <LoginBar />
-    <el-container>
-      <el-aside class="sidebar-left" :class="{ 'is-resizing': isAsideResizing }" :width="`${leftAsideWidth}px`">
-        <div class="sidebar-toggle">ASide Left</div>
-        <div class="aside-resize-handle aside-resize-handle-right" @mousedown="startAsideResize('left', $event)" />
-      </el-aside>
-      <el-main class="content">
-        <HomePage />
-      </el-main>
-      <el-aside class="sidebar-rigth" :class="{ 'is-resizing': isAsideResizing }" :width="`${rightAsideWidth}px`">
-        <div class="aside-resize-handle aside-resize-handle-left" @mousedown="startAsideResize('right', $event)" />
-        <div class="sidebar-toggle">ASide Right</div>
-      </el-aside>
-    </el-container>
+    <MainPage />
   </main>
 </template>
 
