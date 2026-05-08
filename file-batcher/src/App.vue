@@ -36,7 +36,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener("contextmenu", handleContextMenu);
-  stopAsideResize?.();
 });
 
 </script>
@@ -64,57 +63,6 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.sidebar-left {
-  position: relative;
-  flex-shrink: 0;
-  border-right: 1px solid #dcdfe6;
-  background: #ffffff;
-  transition: width 0.2s ease;
-  overflow: hidden;   /* 移除滚动条 */
-}
-
-.sidebar-rigth {
-  position: relative;
-  flex-shrink: 0;
-  border-left: 1px solid #dcdfe6;
-  background: #ffffff;
-  transition: width 0.2s ease;
-  overflow: hidden;   /* 移除滚动条 */
-}
-
-.sidebar-left.is-resizing,
-.sidebar-rigth.is-resizing {
-  transition: none;
-}
-
-.aside-resize-handle {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  cursor: col-resize;
-  z-index: 1;
-}
-
-.aside-resize-handle-left {
-  left: -3px;
-}
-
-.aside-resize-handle-right {
-  right: -3px;
-}
-
-.sidebar-toggle {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px 8px 4px;
-}
-
-.sidebar-toggle-btn {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
 
 .menu {
   border-right: none;
