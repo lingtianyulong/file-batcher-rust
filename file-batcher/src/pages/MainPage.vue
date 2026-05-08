@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-
+import FileList from "./FileList.vue";
 </script>
 
 <template>
@@ -8,7 +8,7 @@
             <div> left </div>
         </el-aside>
         <el-main>
-            <div> main </div>
+            <FileList />
         </el-main>
         <el-aside class="right-siderbar siderbar">
             <div> right </div>
