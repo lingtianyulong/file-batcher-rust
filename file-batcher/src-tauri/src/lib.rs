@@ -8,15 +8,16 @@ mod register;
 
 use chrono::Local;
 use commands::button_commands::*;
+use commands::file_info_commands::*;
 use commands::contextmenu_commands::*;
 use commands::window_commands::*;
-use register::*;
 use login::commands::login_command;
+use register::*;
 use rusqlite::Connection as RawSqliteConnection;
+use std::env;
 use std::fs::File;
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
-use std::env;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -64,25 +65,28 @@ pub fn run() {
         let db_url = format!("sqlite:{}", db_path.to_string_lossy().replace('\\', "/"));
 
         tauri::Builder::default()
-        .plugin(tauri_plugin_sql::Builder::new().build())
+
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
-            window.show().unwrap();
+            window.show()?;
+
             Ok(())
         })
         .plugin(log_plugin)
+        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_sql::Builder::default().add_migrations(db_url.as_str(), vec![migration]).build())
-        .invoke_handler(tauri::generate_handler![
-            get_file_info_command,
-            get_file_list_command,
-            rename_file_command,
-            open_batch_window_command,
-            close_batch_window_command,
-            show_contextmenu_command,
-            login_command,
-            register_command,
+        .invoke_handler(
+            tauri::generate_handler![
+                get_file_info_command,
+                get_file_list_command,
+                rename_file_command,
+                open_batch_window_command,
+                close_batch_window_command,
+                show_contextmenu_command,
+                login_command,
+                register_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

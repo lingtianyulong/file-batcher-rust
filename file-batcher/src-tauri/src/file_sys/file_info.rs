@@ -175,6 +175,7 @@ pub fn get_file_list(
     Ok(file_list)
 }
 
+#[allow(dead_code)]
 pub fn get_file_list_with_progress<F>(
     file_path: &str,
     mut on_progress: F,
