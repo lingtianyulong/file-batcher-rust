@@ -1,32 +1,14 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+
+import { onMounted, onUnmounted } from "vue";
 import "element-plus/dist/index.css";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 import LoginBar from "./components/LoginBar.vue";
 import MainPage from "./pages/MainPage.vue";
 
-const activeMenu = ref("home");
-const route = useRoute();
-
-const routeMenuMap: Record<string, string> = {
-  "/home": "home",
-  "/settings": "settings",
-};
-
-watch(
-  () => route.path,
-  (path) => {
-    activeMenu.value = routeMenuMap[path] ?? "home";
-  },
-  { immediate: true },
-);
-
-
 const handleContextMenu = async (event: MouseEvent) => {
   event.preventDefault();
-  // await invoke("prevent_context_menu");
   await invoke("show_contextmenu_command", { x: event.clientX, y: event.clientY });
 };
 
