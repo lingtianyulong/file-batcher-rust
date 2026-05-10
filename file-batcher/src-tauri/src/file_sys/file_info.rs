@@ -81,7 +81,7 @@ pub fn get_file_info(file_path: &str) -> Result<FileInfo, Box<dyn std::error::Er
     };
 
     let file_type = match path.extension() {
-        Some(file_type) => file_type.to_string_lossy().to_string(),
+        Some(file_type) => file_type.to_string_lossy().to_lowercase(),
         None => {
             let error = std::io::Error::new(
                 std::io::ErrorKind::NotFound,
