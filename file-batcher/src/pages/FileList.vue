@@ -6,6 +6,7 @@ import { open, message } from "@tauri-apps/plugin-dialog";
 import { join } from "@tauri-apps/api/path";
 import { openPath } from "@tauri-apps/plugin-opener";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import PrimeButton from "primevue/button";
 
 type FileInfoRow = {
     fileName: string;
@@ -165,9 +166,10 @@ async function handlePreview(row: FileInfoRow) {
 <template>
     <div class="common-layout">
         <el-row class="file-list-toolbar" align="middle">
-            <el-tooltip content="打开文件" placement="bottom" effect="light">
-                <el-button type="primary" size="small" :icon="icons.DocumentAdd" @click="handleOpenFile"/>
-            </el-tooltip>
+            <!-- <el-tooltip content="打开文件" placement="bottom" effect="light"> -->
+                <PrimeButton size="small" severity="info" icon="pi pi-file-plus" @click="handleOpenFile" />
+                <!-- <el-button type="primary" size="small" :icon="icons.DocumentAdd" @click="handleOpenFile"/> -->
+            <!-- </el-tooltip> -->
             <el-tooltip content="打开文件夹" placement="bottom" effect="light">
                 <el-button type="success" size="small" :icon="icons.FolderOpened" @click="handleOpenFolder"/>
             </el-tooltip>
