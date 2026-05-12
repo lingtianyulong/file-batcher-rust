@@ -1,5 +1,32 @@
 <script lang="ts" setup>
 import * as icons from "@element-plus/icons-vue";
+import { open, message } from "@tauri-apps/plugin-dialog";
+import { ref } from "vue";
+import { useFolderStore } from '../stores/file-store';
+
+const folderStore = useFolderStore();
+const folderPath = ref("");
+
+async function handleOpenFolder() {
+    try {
+        const selectedPath = await open({
+            directory: true,
+            multiple: false,
+        });
+
+        if (!selectedPath || Array.isArray(selectedPath)) {
+            await message("已取消选择文件夹。", {title: "提示", kind: "info"});
+            return;
+        }
+        
+        folderPath.value = selectedPath;
+        folderStore.setPath(selectedPath);
+        console.log(folderPath.value);
+
+    } catch (error) {
+        await message(`打开搜索条件失败：${String(error)}`, {title: "错误", kind: "error"});
+    }
+}
 
 </script>
 
@@ -7,12 +34,13 @@ import * as icons from "@element-plus/icons-vue";
     <div class="search-bar">
         <div class="open-folder">
             <el-lable class="lable">文件目录</el-lable>
-            <el-input type="text" :style="{ width: '65%' }" placeholder="加载文件目录" disabled/>
-            <el-button type="default" style="font-size: 16px; background-color: transparent;" size="default" :icon="icons.FolderOpened"/>
+            <el-input v-model="folderPath" type="text" :style="{ width: '65%' }" placeholder="加载文件目录" readonly/>
+            <el-button type="default" style="font-size: 16px; background-color: transparent;" size="default" 
+            :icon="icons.FolderOpened" @click="handleOpenFolder"/>
         </div>
         <div class="open-folder">
-              <el-lable class="lable">文件目录</el-lable>
-            <el-input type="text" :style="{ width: '65%' }" placeholder="加载文件目录" disabled/>
+            <el-lable class="lable">搜索条件</el-lable>
+            <el-input type="text" :style="{ width: '65%' }" placeholder="请输入搜索条件"/>
             <el-button type="default" style="font-size: 16px; background-color: transparent;" size="default" :icon="icons.Search"/>
             <el-tooltip content="设置搜索选项" placement="bottom" effect="light" popper-class="search-tooltip">
                <el-button type="default" style="font-size: 16px; background-color: transparent;" size="default" :icon="icons.Setting"/>

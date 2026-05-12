@@ -1,6 +1,35 @@
 <script lang="ts" setup>
 import FileList from "./FileList.vue";
 import FolderTree from "./FolderTree.vue";
+import { useFolderStore } from '../stores/file-store';
+import { onMounted, watch } from 'vue';
+
+const folderStore = useFolderStore();
+
+onMounted(() => {
+    if (folderStore.currentPath) {
+        console.log("onMounted in main page", folderStore.currentPath);
+    } else {
+        // console.log("没有选择文件夹");
+    }
+    // console.log(folderStore.currentPath);
+});
+
+watch(
+    () => {
+        console.log("watch in main page", folderStore.currentPath);
+        return folderStore.currentPath;
+    },
+    (newPath) => {
+        // console.log("watch in main page", newPath);
+        if (newPath) {
+            console.log("watch new path in main page", newPath);
+        } else {
+            // console.log("没有选择文件夹");
+        }
+    }
+)
+
 </script>
 
 <template>

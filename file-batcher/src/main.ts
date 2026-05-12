@@ -6,18 +6,19 @@ import Aura from '@primevue/themes/aura';
 import ElementPlus from 'element-plus';
 import PrimeVue from 'primevue/config';
 import Tooltip from 'primevue/tooltip'
-import {createApp} from 'vue';
+import { createApp } from 'vue';
 
 import App from './App.vue';
 import router from './router';
+import { createPinia } from 'pinia';
 
-
+const pinia = createPinia();
 const app = createApp(App);
 app.use(ElementPlus).use(router).use(PrimeVue, {
   theme: {
     preset: Aura,
   },
-});
+}).use(pinia);
 app.directive('tooltip', Tooltip);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
