@@ -6,7 +6,6 @@ import { open, message } from "@tauri-apps/plugin-dialog";
 import { join } from "@tauri-apps/api/path";
 import { openPath } from "@tauri-apps/plugin-opener";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import PrimeButton from "primevue/button";
 
 type FileInfoRow = {
     fileName: string;
@@ -94,11 +93,6 @@ watch([() => filteredFileList.value.length, pageSize], () => {
     }
 });
 
-// const filterFileType = (value: string, row: FileInfoRow) => {
-//     return getFileTypeKey(row.fileType) === value;
-// };
-
-
 async function handleOpenFile() {
     const file_path = await open({
         multiple: false,
@@ -166,12 +160,11 @@ async function handlePreview(row: FileInfoRow) {
 <template>
     <div class="common-layout">
         <el-row class="file-list-toolbar" align="middle">
-            <!-- <el-tooltip content="打开文件" placement="bottom" effect="light"> -->
-                <PrimeButton size="small" severity="info" icon="pi pi-file-plus" @click="handleOpenFile" />
-                <!-- <el-button type="primary" size="small" :icon="icons.DocumentAdd" @click="handleOpenFile"/> -->
-            <!-- </el-tooltip> -->
+            <el-tooltip content="打开文件" placement="bottom" effect="light">
+                <el-button type="primary" style="font-size: 16px;" size="default" :icon="icons.DocumentAdd" @click="handleOpenFile"/>
+            </el-tooltip>
             <el-tooltip content="打开文件夹" placement="bottom" effect="light">
-                <el-button type="success" size="small" :icon="icons.FolderOpened" @click="handleOpenFolder"/>
+                <el-button type="success" size="default" style="font-size: 16px;" :icon="icons.FolderOpened" @click="handleOpenFolder"/>
             </el-tooltip>
             <el-select
                 v-model="selectedFileTypes"
@@ -198,7 +191,7 @@ async function handlePreview(row: FileInfoRow) {
                 <div class="file-list-table">
                     <el-table :data="paginatedFileList" height="100%" style="width: 100%" border empty-text="暂无文件数据" :header-cell-style="{ textAlign: 'center' }">
                         <el-table-column type="index" label="序号" width="80" align="center" :resizable="false"/>
-                        <el-table-column prop="fileName" label="文件名" show-overflow-tooltip :resizable="false" />
+                        <el-table-column prop="fileName" label="文件名" show-overflow-tooltip />
                         <el-table-column prop="fileType" label="文件类型" width="100" align="center" :resizable="false">
                             <template #default="scoped">
                                 {{ getFileTypeLabel(getFileTypeKey(scoped.row.fileType)) }}
@@ -209,7 +202,7 @@ async function handlePreview(row: FileInfoRow) {
                         <el-table-column prop="fileModifyTime" align="center" label="修改时间" width="200" :resizable="false" sortable/>
                         <el-table-column label="操作" width="150" :resizable="false" fixed="right" align="center">
                             <template #default="scoped">
-                                <el-button type="primary" text size="small" :icon="icons.View" @click="handlePreview(scoped.row)">
+                                <el-button type="primary" text size="small" style="font-size: 15px;" font-size="16px" :icon="icons.View" @click="handlePreview(scoped.row)">
                                     预览
                                 </el-button>
                             </template>

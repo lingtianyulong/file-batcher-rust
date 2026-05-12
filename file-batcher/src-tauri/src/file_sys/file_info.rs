@@ -159,18 +159,22 @@ pub fn get_file_list(
         return Err(Box::new(error));
     }
     let files = fs::read_dir(path)?;
+    log::info!("files in get_file_list: {:?}", files);
     let mut file_list = Vec::new();
     for file in files {
         let file = file?;
-        let file_path = file.path();
-        let file_info = match get_file_info(&file_path.to_string_lossy()) {
-            Ok(file_info) => file_info,
-            Err(e) => {
-                log::error!("get file info failed, the error is {}", e.to_string());
-                continue;
-            }
-        };
-        file_list.push(file_info);
+        // 只获取文件，排除文件夹
+        if file.file_type()?.is_file() {
+            let file_path = file.path();
+            let file_info = match get_file_info(&file_path.to_string_lossy()) {
+                Ok(file_info) => file_info,
+                Err(e) => {
+                    log::error!("get file info failed, the error is {}", e.to_string());
+                    continue;
+                }
+            };
+            file_list.push(file_info);
+        }
     }
     Ok(file_list)
 }

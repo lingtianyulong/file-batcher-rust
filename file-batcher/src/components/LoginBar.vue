@@ -24,11 +24,11 @@ function handleUserCommand(command: string) {
 
 <template>
     <div class="login-style">
-        <el-button type="default" style="border: none;"  circle :icon="Setting"></el-button>
+        <el-button type="default" style="border: none; font-size: 20px;"  circle :icon="Setting"></el-button>
         <el-button
           v-if="!isLoggedIn"
           type="default"
-          style="border: none;"
+          style="border: none; font-size: 20px;"
           circle
           :icon="User"
           @click="openLoginDialog"
