@@ -1,70 +1,89 @@
 <script setup lang="ts">
-import { Setting, User, UserFilled } from "@element-plus/icons-vue";
-import { ref } from "vue";
-import LoginDialog from "./LoginDialog.vue";
+import { ref } from 'vue'
 
-const isLoggedIn = ref(false);
-const loginDialogVisible = ref(false);
+import MenuBar from 'primevue/menubar'
 
-function openLoginDialog() {
-  loginDialogVisible.value = true;
-}
+// const menu = ref()
 
-function handleLoginSuccess() {
-  isLoggedIn.value = true;
-}
+const items = ref([
+    {
+        label: '文件',
+        items: [
+            {
+                label: '打开',
+                icon: 'pi pi-folder-open',
+                command: () => {
+                    console.log('打开')
+                }
+            },
+            {
+                label: '删除',
+                icon: 'pi pi-trash',
+                command: () => {
+                    console.log('删除')
+                }
+            },
+            {
+                label: '退出',
+                icon: 'pi pi-power-off',
+                command: () => {
+                    console.log('退出')
+                }
+            }
+        ]
+    },
+    {
+        label: '选项',
+        items: [
+            {
+                label: '设置',
+                icon: 'pi pi-cog',
+                command: () => {
+                    console.log('设置')
+                }
+            },
+            {
+                label: '主题',
+                icon: 'pi pi-cog',
+                command: () => {
+                    console.log('主题')
+                }
+            }
+        ]
+    },
+    {
+        label: '工具',
+        items: [
+            {
+                label: '批量处理',
+                icon: 'pi pi-cog',
+                command: () => {
+                    console.log('批量处理')
+                }
+            },
+            {
+                label: '格式转换',
+                icon: 'pi pi-cog',
+                command: () => {
+                    console.log('日志')
+                }
+            }
+        ]
+    }
+])
 
-function handleUserCommand(command: string) {
-  if (command === "logout") {
-    isLoggedIn.value = false;
-  }
-}
 
 </script>
 
 <template>
-    <div class="login-style">
-        <el-button type="default" style="border: none; font-size: 20px;"  circle :icon="Setting"></el-button>
-        <el-button
-          v-if="!isLoggedIn"
-          type="default"
-          style="border: none; font-size: 20px;"
-          circle
-          :icon="User"
-          @click="openLoginDialog"
-        />
-        <el-dropdown v-else trigger="click" @command="handleUserCommand">
-          <el-button type="default" style="border: none;" circle :icon="User" />
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="profile">
-                <el-icon><UserFilled /></el-icon>
-                个人中心
-              </el-dropdown-item>
-              <el-dropdown-item command="settings">
-                <el-icon><Setting /></el-icon>
-                账号设置
-              </el-dropdown-item>
-              <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-    </div>
-    <LoginDialog v-model="loginDialogVisible" @login-success="handleLoginSuccess" />
+    <MenuBar :model="items" class="p-menubar menubar"/>
 </template>
 
 <style scoped>
-
-.login-style {
-  width: 100%;
-  box-sizing: border-box;
-  height: 40px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
-  padding: 5px 5px 5px 20px;
+.menubar {
+    width: 100%;
+    height: 40px;
+    border-radius: 0;
 }
 
 </style>
