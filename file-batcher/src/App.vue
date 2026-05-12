@@ -6,6 +6,7 @@ import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
 import MenuBar from "./components/MenuBar.vue";
 import MainPage from "./pages/MainPage.vue";
+import SearchBar from "./components/SearchBar.vue";
 
 const handleContextMenu = async (event: MouseEvent) => {
   event.preventDefault();
@@ -26,6 +27,7 @@ onUnmounted(() => {
   <main class="page">
     <TitleBar />
     <MenuBar />
+    <SearchBar />
     <MainPage />
   </main>
 </template>

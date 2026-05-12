@@ -5,6 +5,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import Aura from '@primevue/themes/aura';
 import ElementPlus from 'element-plus';
 import PrimeVue from 'primevue/config';
+import Tooltip from 'primevue/tooltip'
 import {createApp} from 'vue';
 
 import App from './App.vue';
@@ -17,6 +18,7 @@ app.use(ElementPlus).use(router).use(PrimeVue, {
     preset: Aura,
   },
 });
+app.directive('tooltip', Tooltip);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }

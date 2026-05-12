@@ -7,14 +7,13 @@ import FolderTree from "./FolderTree.vue";
     <el-container>
         <el-aside class="left-siderbar siderbar">
             <FolderTree />
-            <!-- <div>  </div> -->
         </el-aside>
-        <el-main>
-            <FileList />
-        </el-main>
-        <el-aside class="right-siderbar siderbar">
-            <div> right </div>
-        </el-aside>
+        <el-container>
+          <el-main>
+            <!-- <FileList /> -->
+          </el-main>
+          <el-footer class="footer">Footer</el-footer>
+        </el-container>
     </el-container>
 </template>
 
@@ -26,8 +25,8 @@ import FolderTree from "./FolderTree.vue";
 
 }
 
-.right-siderbar {
-    border-left: 1px solid #dcdfe6;
+.footer {
+    border-top: 1px solid #dcdfe6;
 }
 
 .siderbar {

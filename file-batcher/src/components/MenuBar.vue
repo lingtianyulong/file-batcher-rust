@@ -69,6 +69,12 @@ const items = ref([
                 }
             }
         ]
+    },
+    {
+        label: '关于',
+        command: () => {
+            console.log('关于')
+        }
     }
 ])
 
@@ -84,6 +90,9 @@ const items = ref([
     width: 100%;
     height: 40px;
     border-radius: 0;
+    font-size: 14px;
+    font-family: 'Microsoft YaHei';
+    font-weight: bold;
 }
 
 </style>
