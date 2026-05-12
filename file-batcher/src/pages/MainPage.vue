@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import FileList from "./FileList.vue";
+import FolderTree from "./FolderTree.vue";
 </script>
 
 <template>
     <el-container>
         <el-aside class="left-siderbar siderbar">
-            <div> left </div>
+            <FolderTree />
+            <!-- <div>  </div> -->
         </el-aside>
         <el-main>
             <FileList />

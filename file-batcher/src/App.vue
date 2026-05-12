@@ -4,7 +4,7 @@ import { onMounted, onUnmounted } from "vue";
 import "element-plus/dist/index.css";
 import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
-import LoginBar from "./components/LoginBar.vue";
+import MenuBar from "./components/MenuBar.vue";
 import MainPage from "./pages/MainPage.vue";
 
 const handleContextMenu = async (event: MouseEvent) => {
@@ -25,7 +25,7 @@ onUnmounted(() => {
 <template>
   <main class="page">
     <TitleBar />
-    <LoginBar />
+    <MenuBar />
     <MainPage />
   </main>
 </template>
