@@ -5,7 +5,9 @@ import { onMounted, watch } from 'vue';
 import { ref } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import * as icons from "@element-plus/icons-vue";
-// import Row from "primevue/row";
+import { message } from "@tauri-apps/plugin-dialog";
+import { join } from "@tauri-apps/api/path";
+import { openPath } from "@tauri-apps/plugin-opener";
 
 const folderStore = useFolderStore();
 
@@ -28,6 +30,28 @@ type RawFileInfo = {
 };
 
 const fileList = ref<FileInfoRow[]>([]);
+
+
+
+onMounted(() => {
+    if (folderStore.currentPath) {
+        console.log("onMounted in main page", folderStore.currentPath);
+        loadFileList(folderStore.currentPath);
+    } 
+});
+
+watch(
+    () => {
+        console.log("watch in main page", folderStore.currentPath);
+        return folderStore.currentPath;
+    },
+    (newPath) => {
+        if (newPath) {
+            console.log("watch new path in main page", newPath);
+            loadFileList(newPath);
+        } 
+    }
+)
 
 async function loadFileList(filePath: string) {
     if (!filePath) {
@@ -54,34 +78,24 @@ async function loadFileList(filePath: string) {
     }));
 }
 
+function formatDisplayTime(value: string) {
+    return value.replace(" ", "\u00A0\u00A0");
+}
 
-
-
-onMounted(() => {
-    if (folderStore.currentPath) {
-        console.log("onMounted in main page", folderStore.currentPath);
-        loadFileList(folderStore.currentPath);
-    } else {
-        // console.log("没有选择文件夹");
+async function handlePreview(row: FileInfoRow) {
+    if (!row.fileName || !row.filePath) {
+        await message("文件路径不完整，无法预览", {title: "警告", kind: "warning"});
+        return;
     }
-    // console.log(folderStore.currentPath);
-});
-
-watch(
-    () => {
-        console.log("watch in main page", folderStore.currentPath);
-        return folderStore.currentPath;
-    },
-    (newPath) => {
-        // console.log("watch in main page", newPath);
-        if (newPath) {
-            console.log("watch new path in main page", newPath);
-            loadFileList(newPath);
-        } else {
-            // console.log("没有选择文件夹");
-        }
+    try {
+        const fullPath = await join(row.filePath, row.fileName);
+        await openPath(fullPath);
+    } catch (error) {
+        await message(`预览失败：${String(error)}`, {title: "错误", kind: "error"});
     }
-)
+}
+
+
 
 </script>
 
@@ -101,16 +115,26 @@ watch(
                     empty-text="暂无文件数据"
                     height="100%"
                     style="width: 100%; min-width: 50rem"
+                    :header-cell-style="{ textAlign: 'center' }"
                 >
                     <el-table-column type="selection" width="48" align="center" />
                     <el-table-column prop="fileName" label="文件名" header-align="center" show-overflow-tooltip min-width="140" />
-                    <el-table-column prop="fileType" label="文件类型" align="center" header-align="center" width="100" />
-                    <el-table-column prop="fileSize" label="文件大小" align="center" header-align="center" width="100" />
-                    <el-table-column prop="fileCreateTime" label="创建时间" align="center" header-align="center" min-width="160" />
-                    <el-table-column prop="fileModifyTime" label="修改时间" align="center" header-align="center" min-width="160" />
+                    <el-table-column prop="fileType" label="文件类型" align="center" width="100" />
+                    <el-table-column prop="fileSize" label="文件大小" align="center" width="100" />
+                    <el-table-column prop="fileCreateTime" label="创建时间" align="center" min-width="160">
+                        <template #default="scoped">
+                            {{ formatDisplayTime(scoped.row.fileCreateTime) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="fileModifyTime" label="修改时间" align="center" min-width="160">
+                        <template #default="scoped">
+                            {{ formatDisplayTime(scoped.row.fileModifyTime) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" align="center" header-align="center" width="100" fixed="right">
-                        <template #default>
-                            <el-button type="primary" text size="small" style="font-size: 15px" :icon="icons.View">
+                        <template #default="scoped">
+                            <el-button type="primary" text size="small" style="font-size: 15px" :icon="icons.View"
+                                @click="handlePreview(scoped.row)">
                                 预览
                             </el-button>
                         </template>
