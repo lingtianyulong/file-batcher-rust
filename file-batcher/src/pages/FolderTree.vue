@@ -3,7 +3,7 @@ import { Folder, Document } from '@element-plus/icons-vue'
 import { Monitor, HardDrive } from '@lucide/vue'
 import type { Component } from 'vue'
 import { onMounted, ref, watch } from 'vue'
-import { basename } from '@tauri-apps/api/path'
+// import { basename } from '@tauri-apps/api/path'
 import { useFolderStore } from '../stores/file-store'
 import { invoke } from '@tauri-apps/api/core'
 
