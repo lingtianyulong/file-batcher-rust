@@ -12,10 +12,7 @@ use commands::file_info_commands::*;
 use commands::contextmenu_commands::*;
 use commands::window_commands::*;
 use login::commands::login_command;
-use register::*;
-use rusqlite::Connection as RawSqliteConnection;
-use std::env;
-use std::fs::File;
+use register::{ register_command, DB_URL };
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -57,13 +54,6 @@ pub fn run() {
             kind: MigrationKind::Up,
         };
 
-        let db_path = env::current_exe().unwrap().parent().unwrap().join("file-batcher.db");
-        if !db_path.exists() {
-            File::create(&db_path).expect("failed to create sqlite database file");
-        }
-        ensure_users_table(&db_path);
-        let db_url = format!("sqlite:{}", db_path.to_string_lossy().replace('\\', "/"));
-
         tauri::Builder::default()
 
         .setup(|app| {
@@ -73,10 +63,13 @@ pub fn run() {
             Ok(())
         })
         .plugin(log_plugin)
-        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_sql::Builder::default().add_migrations(db_url.as_str(), vec![migration]).build())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations(DB_URL, vec![migration])
+                .build(),
+        )
         .invoke_handler(
             tauri::generate_handler![
                 get_file_info_command,
@@ -90,14 +83,4 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-fn ensure_users_table(db_path: &std::path::Path) {
-    let conn = RawSqliteConnection::open(db_path)
-        .expect("failed to open sqlite database for table initialization");
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL, create_time TEXT, update_time TEXT)",
-        [],
-    )
-    .expect("failed to ensure users table exists");
 }

@@ -6,9 +6,8 @@
   >
     <template #default="{ node, data }">
       <div class="tree-node">
-        <el-icon v-if="data.type === 'folder'">
-            <Folder v-if="!node.expanded"/>
-            <FolderOpened v-else/>
+        <el-icon v-if="data.type === 'monitor'">
+          <Monitor />
         </el-icon>
 
         <el-icon v-else>
@@ -25,12 +24,13 @@
 
 <script setup>
 import { Folder, Document } from '@element-plus/icons-vue'
+import { Monitor } from '@lucide/vue'
 
 const treeData = [
   {
     id: 1,
     label: 'src',
-    type: 'folder',
+    type: 'monitor',
     children: [
       {
         id: 2,

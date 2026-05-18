@@ -1,41 +1,50 @@
 use crate::common::user::User;
-use rusqlite::{Connection as RawSqliteConnection, Result as SqlResult};
-use std::env;
-use std::fs::File;
+// use sqlx::Executor;
+use tauri::{AppHandle, Manager};
+use tauri_plugin_sql::{DbInstances, DbPool};
 
-struct SqliteConnection;
-impl SqliteConnection {
-    fn connect(path: &str) -> SqlResult<RawSqliteConnection> {
-        RawSqliteConnection::open(path)
-    }
-}
+/// 与 `lib.rs` 中 `tauri_plugin_sql` 迁移/预加载使用的连接串一致
+pub const DB_URL: &str = "sqlite:file-batcher.db";
 
 #[tauri::command]
-pub fn register_command(username: String, password: String) -> Result<String, String> {
-    log::info!("register_command, username: {}, password: {}", username, password);
+pub async fn register_command(
+    app: AppHandle,
+    username: String,
+    password: String,
+) -> Result<String, String> {
+    log::info!(
+        "register_command, username: {}, password: {}",
+        username,
+        password
+    );
     let user = User::new(username, password);
-    let db_path = env::current_exe().unwrap().parent().unwrap().join("file-batcher.db");
-    if !db_path.exists() {
-        File::create(&db_path).expect("failed to create sqlite database file");
-    }
-    let db_file = db_path.to_string_lossy().replace('\\', "/");
-    log::info!("db_file: {}", db_file);
 
-    match SqliteConnection::connect(db_file.as_str()) {
-        Ok(db) => {
-            let result = db
-                .execute(
-                    "INSERT INTO users (id, username, password, create_time, update_time) VALUES (?, ?, ?, ?, ?)",
-                    (user.id, user.username, user.password, user.create_time, user.update_time),
-                )
-                .map_err(|e| e.to_string())?;
-            if result == 0 {
-                return Err("register failed".to_string());
-            }
-            Ok("register success".to_string())
+    let instances = app.state::<DbInstances>();
+    let guard = instances.0.read().await;
+    let pool = guard
+        .get(DB_URL)
+        .ok_or_else(|| "数据库未加载，请重启应用后重试".to_string())?;
+
+    let result = match pool {
+        DbPool::Sqlite(sqlite_pool) => {
+            sqlx::query(
+                "INSERT INTO users (id, username, password, create_time, update_time) VALUES ($1, $2, $3, $4, $5)",
+            )
+            .bind(&user.id)
+            .bind(&user.username)
+            .bind(&user.password)
+            .bind(&user.create_time)
+            .bind(&user.update_time)
+            .execute(sqlite_pool)
+            .await
+            .map_err(|e| e.to_string())?
         }
-        Err(e) => {
-            return Err(e.to_string());
-        }
+        #[allow(unreachable_patterns)]
+        _ => return Err("不支持的数据库类型".to_string()),
+    };
+
+    if result.rows_affected() == 0 {
+        return Err("register failed".to_string());
     }
+    Ok("register success".to_string())
 }
