@@ -10,6 +10,7 @@ import { join } from "@tauri-apps/api/path";
 import { openPath } from "@tauri-apps/plugin-opener";
 
 const folderStore = useFolderStore();
+const loading = ref(false);
 
 type FileInfoRow = {
     fileName: string;
@@ -89,7 +90,10 @@ async function handlePreview(row: FileInfoRow) {
 onMounted(() => {
     if (folderStore.currentPath) {
         console.log("onMounted in main page", folderStore.currentPath);
-        loadFileList(folderStore.currentPath);
+        loading.value = true;
+        loadFileList(folderStore.currentPath).finally(() => {
+            loading.value = false;
+        });
     }
 });
 
@@ -98,7 +102,10 @@ watch(
     (newPath) => {
         if (newPath) {
             console.log("watch new path in main page", newPath);
-            loadFileList(newPath);
+            loading.value = true;
+            loadFileList(newPath).finally(() => {
+                loading.value = false;
+            });
         }
     }
 );
@@ -123,6 +130,8 @@ watch(
                     style="width: 100%; min-width: 50rem"
                     @selection-change="handleSelectionChange"
                     :header-cell-style="{ textAlign: 'center' }"
+                    v-loading="loading"
+                    element-loading-text="加载中..."
                 >
                     <el-table-column type="selection" width="48" align="center" />
                     <el-table-column prop="fileName" label="文件名" show-overflow-tooltip min-width="140" />
@@ -149,7 +158,6 @@ watch(
                         </template>
                     </el-table-column>
                 </el-table>
-
             </div>
           </el-main>
           <el-footer class="footer">Footer</el-footer>
