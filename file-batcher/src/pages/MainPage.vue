@@ -28,17 +28,29 @@ type RawFileInfo = {
 };
 
 const fileList = ref<FileInfoRow[]>([]);
+const selectedRows = ref<FileInfoRow[]>([]);
+
+/** 后端 file_path 为目录路径，同目录下多文件相同，不能单独作为 row-key */
+function getRowKey(row: FileInfoRow) {
+    return `${row.filePath}\0${row.fileName}`;
+}
+
+function handleSelectionChange(rows: FileInfoRow[]) {
+    selectedRows.value = rows;
+}
 
 async function loadFileList(filePath: string) {
     if (!filePath) {
         console.log("loadFileList, filePath is empty");
         fileList.value = [];
+        selectedRows.value = [];
         return;
     }
 
     if (filePath.length === 0) {
         console.log("loadFileList, filePath is empty");
         fileList.value = [];
+        selectedRows.value = [];
         return;
     }
 
@@ -52,10 +64,8 @@ async function loadFileList(filePath: string) {
         fileCreateTime: file.file_create_time ?? "",
         fileModifyTime: file.file_modify_time ?? "",
     }));
+    selectedRows.value = [];
 }
-
-
-
 
 onMounted(() => {
     if (folderStore.currentPath) {
@@ -97,10 +107,11 @@ watch(
                     class="file-list-table"
                     :data="fileList"
                     border
-                    row-key="filePath"
+                    :row-key="getRowKey"
                     empty-text="暂无文件数据"
                     height="100%"
                     style="width: 100%; min-width: 50rem"
+                    @selection-change="handleSelectionChange"
                 >
                     <el-table-column type="selection" width="48" align="center" />
                     <el-table-column prop="fileName" label="文件名" header-align="center" show-overflow-tooltip min-width="140" />
