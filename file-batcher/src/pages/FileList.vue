@@ -143,6 +143,10 @@ async function handleOpenFolder() {
     currentPage.value = 1;
 }
 
+function formatDisplayTime(value: string) {
+    return value.replace(" ", "\u00A0\u00A0");
+}
+
 async function handlePreview(row: FileInfoRow) {
     if (!row.fileName || !row.filePath) {
         await message("文件路径不完整，无法预览", {title: "警告", kind: "warning"});
@@ -198,8 +202,16 @@ async function handlePreview(row: FileInfoRow) {
                             </template>
                         </el-table-column>
                         <el-table-column prop="fileSize" label="文件大小" width="100" align="center" :resizable="false"/>
-                        <el-table-column prop="fileCreateTime" align="center" label="创建时间" width="200" :resizable="false" sortable/>
-                        <el-table-column prop="fileModifyTime" align="center" label="修改时间" width="200" :resizable="false" sortable/>
+                        <el-table-column prop="fileCreateTime" align="center" label="创建时间" width="200" :resizable="false" sortable>
+                            <template #default="scoped">
+                                {{ formatDisplayTime(scoped.row.fileCreateTime) }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="fileModifyTime" align="center" label="修改时间" width="200" :resizable="false" sortable>
+                            <template #default="scoped">
+                                {{ formatDisplayTime(scoped.row.fileModifyTime) }}
+                            </template>
+                        </el-table-column>
                         <el-table-column label="操作" width="150" :resizable="false" fixed="right" align="center">
                             <template #default="scoped">
                                 <el-button type="primary" text size="small" style="font-size: 15px;" font-size="16px" :icon="icons.View" @click="handlePreview(scoped.row)">
