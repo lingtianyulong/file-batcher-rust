@@ -5,12 +5,14 @@ mod commands;
 mod file_sys;
 mod login;
 mod register;
+mod disks;
 
 use chrono::Local;
 use commands::button_commands::*;
 use commands::file_info_commands::*;
 use commands::contextmenu_commands::*;
 use commands::window_commands::*;
+use commands::diskinfo_commands::*;
 use login::commands::login_command;
 use register::{ register_command, DB_URL };
 use tauri::Manager;
@@ -80,6 +82,7 @@ pub fn run() {
                 show_contextmenu_command,
                 login_command,
                 register_command,
+                get_disk_list_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
