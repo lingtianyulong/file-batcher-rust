@@ -10,8 +10,12 @@
           <Monitor />
         </el-icon>
 
+        <el-icon v-else-if="data.type === 'folder'">
+          <Folder />
+        </el-icon>
+
         <el-icon v-else>
-            <Document />
+          <Document />
         </el-icon>
 
         <span class="label">
@@ -25,21 +29,50 @@
 <script setup>
 import { Folder, Document } from '@element-plus/icons-vue'
 import { Monitor } from '@lucide/vue'
+import { ref, watch } from 'vue'
+import { basename } from '@tauri-apps/api/path'
+import { useFolderStore } from '../stores/file-store'
 
-const treeData = [
+const folderStore = useFolderStore()
+
+/** 根节点固定 id，子节点用目录 path 作为 id 便于去重 */
+const treeData = ref([
   {
-    id: 1,
-    label: 'src',
+    id: '__root__',
+    label: '我的电脑',
     type: 'monitor',
-    children: [
-      {
-        id: 2,
-        label: 'main.ts',
-        type: 'file'
-      }
-    ]
+    children: []
   }
-]
+])
+
+async function addFolderNodeIfNeeded(dirPath) {
+  if (!dirPath) return
+  const root = treeData.value[0]
+  if (!root.children) {
+    root.children = []
+  }
+  const exists = root.children.some((n) => n.path === dirPath || n.id === dirPath)
+  if (exists) return
+  const label = await basename(dirPath)
+  root.children.push({
+    id: dirPath,
+    label,
+    type: 'folder',
+    path: dirPath,
+    children: []
+  })
+}
+
+watch(
+  () => folderStore.currentPath,
+  (p) => {
+    if (p) {
+      void addFolderNodeIfNeeded(p)
+    }
+  },
+  { immediate: true }
+)
+
 </script>
 
 <style scoped>
