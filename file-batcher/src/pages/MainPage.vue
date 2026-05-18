@@ -86,7 +86,22 @@ async function handlePreview(row: FileInfoRow) {
     }
 }
 
+onMounted(() => {
+    if (folderStore.currentPath) {
+        console.log("onMounted in main page", folderStore.currentPath);
+        loadFileList(folderStore.currentPath);
+    }
+});
 
+watch(
+    () => folderStore.currentPath,
+    (newPath) => {
+        if (newPath) {
+            console.log("watch new path in main page", newPath);
+            loadFileList(newPath);
+        }
+    }
+);
 
 </script>
 
@@ -107,22 +122,25 @@ async function handlePreview(row: FileInfoRow) {
                     height="100%"
                     style="width: 100%; min-width: 50rem"
                     @selection-change="handleSelectionChange"
+                    :header-cell-style="{ textAlign: 'center' }"
                 >
                     <el-table-column type="selection" width="48" align="center" />
-                    <el-table-column prop="fileName" label="文件名" header-align="center" show-overflow-tooltip min-width="140" />
+                    <el-table-column prop="fileName" label="文件名" show-overflow-tooltip min-width="140" />
                     <el-table-column prop="fileType" label="文件类型" align="center" width="100" />
                     <el-table-column prop="fileSize" label="文件大小" align="center" width="100" />
-                    <el-table-column prop="fileCreateTime" label="创建时间" align="center" min-width="160">
+                    <el-table-column prop="fileCreateTime" label="创建时间" align="center" min-width="150"
+                        :width="200">
                         <template #default="scoped">
                             {{ formatDisplayTime(scoped.row.fileCreateTime) }}
                         </template>
                     </el-table-column>
-                    <el-table-column prop="fileModifyTime" label="修改时间" align="center" min-width="160">
+                    <el-table-column prop="fileModifyTime" label="修改时间" align="center" min-width="150"
+                        :width="200">
                         <template #default="scoped">
                             {{ formatDisplayTime(scoped.row.fileModifyTime) }}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" header-align="center" width="100" fixed="right">
+                    <el-table-column label="操作" align="center" width="100" fixed="right">
                         <template #default="scoped">
                             <el-button type="primary" text size="small" style="font-size: 15px" :icon="icons.View"
                                 @click="handlePreview(scoped.row)">
