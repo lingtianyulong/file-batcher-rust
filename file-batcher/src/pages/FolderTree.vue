@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Folder, Document } from '@element-plus/icons-vue'
-import * as icons from '@lucide/vue'
-import type { Component } from 'vue'
+// import * as icons from '@lucide/vue'
+// import type { Component } from 'vue'
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useFolderStore } from '../stores/file-store'
 import { invoke } from '@tauri-apps/api/core'
