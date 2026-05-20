@@ -13,6 +13,7 @@ use commands::file_info_commands::*;
 use commands::contextmenu_commands::*;
 use commands::window_commands::*;
 use commands::diskinfo_commands::*;
+use commands::directory_commands::*;
 use login::commands::login_command;
 use register::{ register_command, DB_URL };
 use tauri::Manager;
@@ -84,6 +85,7 @@ pub fn run() {
                 register_command,
                 get_disk_list_command,
                 get_disk_info_command,
+                get_dir_info_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -174,8 +174,10 @@ async function handleNodeClick(node: TreeNode) {
 }
 
 /** 节点展开事件 */
-function handleNodeExpand(node: TreeNode) {
+async function handleNodeExpand(node: TreeNode) {
   // console.log("handleNodeExpand", node)
+  const dir_info = await invoke<string>("get_dir_info_command", { dirPath: node.label })
+  console.log("dir_info", dir_info)
 
 }
 
