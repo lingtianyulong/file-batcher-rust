@@ -179,6 +179,17 @@ function handleNodeExpand(node: TreeNode) {
 
 }
 
+const customColor = (precentage: number): string => {
+  console.log("precentage", precentage)
+  if (precentage < 80) {
+    return '#409EFF' // 蓝色
+  } else if (precentage < 95) {
+    return '#F56C6C' // 红色
+  } else {
+    return '#8B0000' // 深红色
+  }
+}
+
 </script>
 
 <template>
@@ -209,6 +220,7 @@ function handleNodeExpand(node: TreeNode) {
         <el-progress
           :percentage="diskInfo.totalSpace ? diskInfo.usedSpace ? diskInfo.usedSpace / diskInfo.totalSpace * 100 : 0 : 0"
           :show-text="false"
+          :color="customColor"
         />
       </div>
       <span style="font-size: 13px;">可用: {{ diskInfo.freeSpace ?? 0 }} GB, 总容量: {{ diskInfo.totalSpace ?? 0 }} GB</span>
