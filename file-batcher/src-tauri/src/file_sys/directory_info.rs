@@ -11,6 +11,7 @@ pub struct DirFileInfo {
     is_dir: bool,           // 是否是目录
     has_sub_dir: bool,      // 是否包含子目录
     sub_dirs: Vec<DirFileInfo>,  // 子目录
+    file_type: Option<String>,   // 文件类型
 }
 
 impl DirFileInfo {
@@ -39,6 +40,7 @@ impl DirFileInfo {
             is_dir: true,
             has_sub_dir: false,
             sub_dirs: Vec::new(),
+            file_type: None,
         };
 
         for entry in std::fs::read_dir(path)? {
@@ -70,6 +72,8 @@ impl DirFileInfo {
                 dir_info.has_sub_dir = true;
             }
 
+            let file_type = entry_path.extension().map(|ext| ext.to_string_lossy().to_lowercase());
+
             let display_path = entry_path.display().to_string();
             let entry_name = entry
                 .file_name()
@@ -80,6 +84,7 @@ impl DirFileInfo {
                 name: entry_name,
                 path: display_path,
                 is_dir: is_entry_dir,
+                file_type,
                 // 目录节点可继续展开；是否真有子项在下次展开时再拉取
                 has_sub_dir: is_entry_dir,
                 sub_dirs: Vec::new(),

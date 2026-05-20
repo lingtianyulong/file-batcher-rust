@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Folder, Document } from '@element-plus/icons-vue'
-import { Monitor, HardDrive } from '@lucide/vue'
+import * as icons from '@lucide/vue'
 import type { Component } from 'vue'
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useFolderStore } from '../stores/file-store'
 import { invoke } from '@tauri-apps/api/core'
+import { Icon } from '@iconify/vue'
 
 const folderStore = useFolderStore()
 const treeContainerRef = useTemplateRef<HTMLElement>('treeContainerRef')
@@ -26,6 +27,7 @@ type DirInfo = {
   isDir: boolean
   hasSubDir: boolean
   subDirs: DirInfo[]
+  fileType?: string
 }
 
 type TreeNode = {
@@ -44,14 +46,30 @@ const treeProps = {
 }
 
 
-const iconMap: Record<string, Component> = {
-  'monitor': Monitor,
-  'disk': HardDrive,
-  'folder': Folder,
-  'file': Document
+const iconMap: Record<string, string> = {
+  'zip': 'fluent:folder-zip-24-regular',
+  'rar': 'fluent:folder-zip-24-regular',
+  '7z': 'fluent:folder-zip-24-regular',
+
+  'txt': 'fluent:document-bullet-list-24-regular',
+  'pdf': 'vscode-icons:file-type-pdf2',
+  'rs': 'vscode-icons:file-type-rust',
+  'vue': 'vscode-icons:file-type-vue',
+
+  'png': 'vscode-icons:file-type-image',
+  'jpg': 'vscode-icons:file-type-image',
+  'jpeg': 'vscode-icons:file-type-image',
+  'gif': 'vscode-icons:file-type-image',
+  'bmp': 'vscode-icons:file-type-image',
+
+  'xml': 'vscode-icons:file-type-xml',
+
+  'cs': 'vscode-icons:file-type-csharp',
+  'cpp': 'vscode-icons:file-type-cpp',
+  'c': 'vscode-icons:file-type-c',
 }
 
-function getNodeIcon(type: string) {
+function getFileIcon(type: string) {
   return iconMap[type] ?? Document
 }
 
@@ -250,7 +268,7 @@ async function handleNodeExpand(node: TreeNode) {
     const incoming: TreeNode[] = dirInfo.subDirs.map((sub) => ({
       id: sub.path,
       label: sub.name,
-      type: sub.isDir ? 'folder' : 'file',
+      type: sub.isDir ? 'folder' : (sub.fileType ?? 'file'),
       path: sub.path,
       children: sub.isDir ? [createLoadingChild(sub.path)] : undefined
     }))
@@ -292,9 +310,22 @@ const customColor = (precentage: number): string => {
     >
       <template #default="{ node, data }">
         <div class="tree-node">
-          <el-icon>
-            <component :is="getNodeIcon(data.type)" />
-          </el-icon>
+          <div v-if="data.type === 'monitor'">
+            <el-icon>
+              <Monitor />
+            </el-icon>
+          </div>
+          <div v-else-if="data.type === 'disk'">
+            <Icon icon="fluent:hard-drive-48-regular" />
+          </div>
+          <div v-else-if="data.type === 'folder'">
+            <el-icon>
+              <Folder />
+            </el-icon>
+          </div>
+          <div v-else>
+            <Icon :icon="getFileIcon(data.type)"/>
+          </div>
           <span>{{ node.label }}</span>
         </div>
       </template>
