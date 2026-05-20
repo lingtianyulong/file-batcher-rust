@@ -9,7 +9,7 @@ pub struct DirFileInfo {
     path: String,           // 目录路径
     is_dir: bool,           // 是否是目录
     has_sub_dir: bool,      // 是否包含子目录
-    sub_dirs: Vec<String>,  // 子目录
+    sub_dirs: Vec<DirFileInfo>,  // 子目录
 }
 
 impl DirFileInfo {
@@ -27,9 +27,16 @@ impl DirFileInfo {
             .filter(|n| !n.is_empty())
             .unwrap_or_else(|| path.display().to_string());
 
-        let mut sub_dirs = Vec::new();
+        // let mut sub_dirs = Vec::new();
         let mut has_sub_dir = false;
         let mut is_dir = false;
+        let mut dir_info = DirFileInfo {
+            name: dir_name.clone(),
+            path: dir_name.clone(),
+            is_dir,
+            has_sub_dir,
+            sub_dirs: Vec::new(),
+        };
 
         for entry in std::fs::read_dir(path)? {
             let entry = match entry {
@@ -55,27 +62,29 @@ impl DirFileInfo {
             }
 
             let entry_path = entry.path();
-            sub_dirs.push(entry_path.display().to_string());
+            // sub_dirs.push(entry_path.display().to_string());
             if entry_path.is_dir() {
                 has_sub_dir = true;
                 is_dir = true;
             }
+
+            dir_info.sub_dirs.push(DirFileInfo {
+                name: entry_path.display().to_string(),
+                path: entry_path.display().to_string(),
+                is_dir,
+                has_sub_dir,
+                sub_dirs: Vec::new(),
+            });
 
         }
 
         log::info!(
             "get_dir_info, path={}, child_count={}, has_sub_dir={}",
             dir_path,
-            sub_dirs.len(),
-            has_sub_dir
+            dir_info.sub_dirs.len(),
+            dir_info.has_sub_dir
         );
 
-        Ok(DirFileInfo {
-            name: dir_name.clone(),
-            path: dir_name.clone(),
-            is_dir,
-            has_sub_dir,
-            sub_dirs,
-        })
+        Ok(dir_info)
     }
 }
