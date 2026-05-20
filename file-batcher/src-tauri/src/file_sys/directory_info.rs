@@ -4,6 +4,7 @@ use windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_HIDDEN;
 
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DirFileInfo {
     name: String,           // 目录名称
     path: String,           // 目录路径
@@ -15,7 +16,12 @@ pub struct DirFileInfo {
 impl DirFileInfo {
     pub fn get_dir_info(dir_path: &str) -> Result<DirFileInfo, Box<dyn std::error::Error + 'static>> {
         log::info!("get_dir_info, the dir path is {}", dir_path);
-        let path = Path::new(dir_path).join(r"\");
+        let normalized_path = if dir_path.ends_with(':') {
+            format!(r"{}\", dir_path)
+        } else {
+            dir_path.to_string()
+        };
+        let path = Path::new(&normalized_path);
         if !path.is_dir() {
             log::error!("get_dir_info, the dir path not found, the dir path is {}", dir_path);
             return Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, "Directory not found")));
@@ -27,14 +33,11 @@ impl DirFileInfo {
             .filter(|n| !n.is_empty())
             .unwrap_or_else(|| path.display().to_string());
 
-        // let mut sub_dirs = Vec::new();
-        let mut has_sub_dir = false;
-        let mut is_dir = false;
         let mut dir_info = DirFileInfo {
             name: dir_name.clone(),
-            path: dir_name.clone(),
-            is_dir,
-            has_sub_dir,
+            path: dir_path.to_string(),
+            is_dir: true,
+            has_sub_dir: false,
             sub_dirs: Vec::new(),
         };
 
@@ -62,17 +65,23 @@ impl DirFileInfo {
             }
 
             let entry_path = entry.path();
-            // sub_dirs.push(entry_path.display().to_string());
-            if entry_path.is_dir() {
-                has_sub_dir = true;
-                is_dir = true;
+            let is_entry_dir = entry_path.is_dir();
+            if is_entry_dir {
+                dir_info.has_sub_dir = true;
             }
 
+            let display_path = entry_path.display().to_string();
+            let entry_name = entry
+                .file_name()
+                .to_string_lossy()
+                .into_owned();
+
             dir_info.sub_dirs.push(DirFileInfo {
-                name: entry_path.display().to_string(),
-                path: entry_path.display().to_string(),
-                is_dir,
-                has_sub_dir,
+                name: entry_name,
+                path: display_path,
+                is_dir: is_entry_dir,
+                // 目录节点可继续展开；是否真有子项在下次展开时再拉取
+                has_sub_dir: is_entry_dir,
                 sub_dirs: Vec::new(),
             });
 

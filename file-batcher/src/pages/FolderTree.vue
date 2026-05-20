@@ -20,11 +20,20 @@ type RawDiskInfo = {
   freeSpace?: number
 }
 
+type DirInfo = {
+  name: string
+  path: string
+  isDir: boolean
+  hasSubDir: boolean
+  subDirs: DirInfo[]
+}
+
 type TreeNode = {
   id: string
   label: string
   type: string
   path?: string
+  loaded?: boolean
   children?: TreeNode[]
 }
 
@@ -60,11 +69,50 @@ const treeData = ref<TreeNode[]>([
   }
 ])
 
-/** el-tree-v2 仅在 data 引用变化时重建树，且子节点需父节点在 defaultExpandedKeys 中 */
-const defaultExpandedKeys = ref<string[]>(['__root__'])
+/** el-tree-v2 会监听 defaultExpandedKeys，异步替换 children 后用它刷新可见节点 */
+const expandedKeys = ref<string[]>(['__root__'])
 
 function replaceTreeRoot(root: TreeNode) {
   treeData.value = [root]
+}
+
+function createLoadingChild(parentId: string): TreeNode {
+  return {
+    id: `${parentId}__loading__`,
+    label: '加载中...',
+    type: 'file'
+  }
+}
+
+function ensureExpanded(id: string) {
+  if (!expandedKeys.value.includes(id)) {
+    expandedKeys.value = [...expandedKeys.value, id]
+  }
+}
+
+function removeExpanded(id: string) {
+  expandedKeys.value = expandedKeys.value.filter((key) => key !== id)
+}
+
+/** el-tree-v2 对深层 children 变更不敏感，需替换整条 data 才能刷新 */
+function mergeChildrenIntoTree(
+  nodes: TreeNode[],
+  targetId: string,
+  incoming: TreeNode[]
+): TreeNode[] {
+  return nodes.map((n) => {
+    if (n.id === targetId) {
+      const byId = new Map<string, TreeNode>()
+      for (const c of incoming) {
+        byId.set(c.id, c)
+      }
+      return { ...n, loaded: true, children: [...byId.values()] }
+    }
+    if (n.children?.length) {
+      return { ...n, children: mergeChildrenIntoTree(n.children, targetId, incoming) }
+    }
+    return n
+  })
 }
 
 async function addDriveLetterNode(disk: RawDiskInfo) {
@@ -85,7 +133,7 @@ async function addDriveLetterNode(disk: RawDiskInfo) {
         id: mountPoint,
         label: mountPoint,
         type: 'disk',
-        children: []
+        children: [createLoadingChild(mountPoint)]
       }
     ]
   })
@@ -175,10 +223,47 @@ async function handleNodeClick(node: TreeNode) {
 
 /** 节点展开事件 */
 async function handleNodeExpand(node: TreeNode) {
-  // console.log("handleNodeExpand", node)
-  const dir_info = await invoke<string>("get_dir_info_command", { dirPath: node.label })
-  console.log("dir_info", dir_info)
+  if (node.type !== 'disk' && node.type !== 'folder') {
+    return
+  }
+  ensureExpanded(node.id)
+  if (node.loaded) {
+    return
+  }
+  const dirPath = node.path ?? node.label
+  try {
+    const dir_info = await invoke<string>("get_dir_info_command", { dirPath })
+    const parsed = JSON.parse(dir_info) as {
+      name: string
+      path: string
+      isDir: boolean
+      hasSubDir: boolean
+      subDirs: DirInfo[]
+    }
+    const dirInfo: DirInfo = {
+      name: parsed.name,
+      path: parsed.path,
+      isDir: parsed.isDir,
+      hasSubDir: parsed.hasSubDir,
+      subDirs: parsed.subDirs ?? []
+    }
+    const incoming: TreeNode[] = dirInfo.subDirs.map((sub) => ({
+      id: sub.path,
+      label: sub.name,
+      type: sub.isDir ? 'folder' : 'file',
+      path: sub.path,
+      children: sub.isDir ? [createLoadingChild(sub.path)] : undefined
+    }))
+    treeData.value = mergeChildrenIntoTree(treeData.value, node.id, incoming)
+    ensureExpanded(node.id)
+  } catch (e) {
+    console.error("get_dir_info_command failed", e)
+  }
+}
 
+/** 节点收起事件 */
+function handleNodeCollapse(node: TreeNode) {
+  removeExpanded(node.id)
 }
 
 const customColor = (precentage: number): string => {
@@ -199,10 +284,11 @@ const customColor = (precentage: number): string => {
     <el-tree-v2
       :data="treeData"
       :props="treeProps"
-      :default-expanded-keys="defaultExpandedKeys"
+      :default-expanded-keys="expandedKeys"
       :height="treeHeight"
       @node-click="handleNodeClick"
       @node-expand="handleNodeExpand"
+      @node-collapse="handleNodeCollapse"
     >
       <template #default="{ node, data }">
         <div class="tree-node">
