@@ -83,6 +83,7 @@ pub fn run() {
                 login_command,
                 register_command,
                 get_disk_list_command,
+                get_disk_info_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
