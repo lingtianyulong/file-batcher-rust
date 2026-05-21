@@ -288,8 +288,13 @@ async function getDiskInfo(diskName: string): Promise<RawDiskInfo> {
 
 /** 节点点击事件 */
 async function handleNodeClick(node: TreeNode) {
-  const info: RawDiskInfo = await getDiskInfo(node.label)
-  diskInfo.value = info
+  if (node.type === 'disk') {
+    const info: RawDiskInfo = await getDiskInfo(node.label)
+    diskInfo.value = info
+    folderStore.currentPath = info.mountPoint ?? info.diskName ?? ""
+  } else if (node.type === 'folder') {
+    folderStore.currentPath = node.path ?? node.label
+  }
 }
 
 /** 节点展开事件 */
@@ -347,6 +352,7 @@ const customColor = (precentage: number): string => {
     return '#8B0000' // 深红色
   }
 }
+
 
 </script>
 
