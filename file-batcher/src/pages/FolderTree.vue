@@ -127,6 +127,44 @@ function removeExpanded(id: string) {
   expandedKeys.value = expandedKeys.value.filter((key) => key !== id)
 }
 
+/** 递归收集某节点下所有的子孙节点 id */
+function getDescendantIds(node: TreeNode): string[] {
+  const ids: string[] = []
+  if (node.children?.length) {
+    for (const child of node.children) {
+      ids.push(child.id)
+      ids.push(...getDescendantIds(child))
+    }
+  }
+  return ids
+}
+
+/** 在树中根据 id 递归查找节点 */
+function findNodeById(nodes: TreeNode[], id: string): TreeNode | null {
+  for (const n of nodes) {
+    if (n.id === id) {
+      return n
+    }
+    if (n.children?.length) {
+      const found = findNodeById(n.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+/** 干净地折叠一个节点，连同其所有的子孙节点一同从展开列表中移出 */
+function collapseNodeAndDescendants(id: string) {
+  const targetNode = findNodeById(treeData.value, id)
+  if (targetNode) {
+    const descendantIds = getDescendantIds(targetNode)
+    const idsToRemove = new Set([id, ...descendantIds])
+    expandedKeys.value = expandedKeys.value.filter((key) => !idsToRemove.has(key))
+  } else {
+    removeExpanded(id)
+  }
+}
+
 /** el-tree-v2 对深层 children 变更不敏感，需替换整条 data 才能刷新 */
 function mergeChildrenIntoTree(
   nodes: TreeNode[],
@@ -296,7 +334,7 @@ async function handleNodeExpand(node: TreeNode) {
 
 /** 节点收起事件 */
 function handleNodeCollapse(node: TreeNode) {
-  removeExpanded(node.id)
+  collapseNodeAndDescendants(node.id)
 }
 
 const customColor = (precentage: number): string => {
