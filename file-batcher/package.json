@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@iconify-vue/fluent": "^1.0.5",
+    "@iconify-vue/glyphs-poly": "^1.0.2",
+    "@iconify-vue/icon-park-twotone": "^1.0.3",
+    "@iconify-vue/line-md": "^1.0.7",
     "@iconify-vue/vscode-icons": "^1.0.23",
     "@iconify/vue": "^5.0.1",
     "@lucide/vue": "^1.16.0",

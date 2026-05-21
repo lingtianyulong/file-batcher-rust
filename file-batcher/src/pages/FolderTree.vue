@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { Folder, Document } from '@element-plus/icons-vue'
-// import * as icons from '@lucide/vue'
-// import type { Component } from 'vue'
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useFolderStore } from '../stores/file-store'
 import { invoke } from '@tauri-apps/api/core'
@@ -47,9 +44,9 @@ const treeProps = {
 
 
 const iconMap: Record<string, string> = {
-  'zip': 'fluent:folder-zip-24-regular',
-  'rar': 'fluent:folder-zip-24-regular',
-  '7z': 'fluent:folder-zip-24-regular',
+  'zip': 'vscode-icons:file-type-zip',
+  'rar': 'vscode-icons:file-type-zip',
+  '7z': 'vscode-icons:file-type-zip',
 
   'txt': 'fluent:document-bullet-list-24-regular',
   'pdf': 'vscode-icons:file-type-pdf2',
@@ -63,14 +60,32 @@ const iconMap: Record<string, string> = {
   'bmp': 'vscode-icons:file-type-image',
 
   'xml': 'vscode-icons:file-type-xml',
+  'json': 'vscode-icons:file-type-json',
+  'ts': 'vscode-icons:file-type-typescript',
+  'tsx': 'vscode-icons:file-type-typescript',
+  'html': 'vscode-icons:file-type-html',
+  'toml': 'vscode-icons:file-type-toml',
 
   'cs': 'vscode-icons:file-type-csharp',
   'cpp': 'vscode-icons:file-type-cpp',
   'c': 'vscode-icons:file-type-c',
+  'h': 'vscode-icons:file-type-cheader',
+  'hpp': 'vscode-icons:file-type-cppheader',
+  'sln': 'vscode-icons:file-type-sln',
+  'slnx': 'vscode-icons:file-type-sln',
+  'xaml': 'vscode-icons:file-type-xaml',
+  'csproj': 'vscode-icons:file-type-csproj',
+  'md': 'vscode-icons:file-type-markdown',
+
+  'config': 'vscode-icons:file-type-config',
+  'bat': 'vscode-icons:file-type-bat',
+  'sh': 'vscode-icons:file-type-shell',
+  'yml': 'vscode-icons:file-type-yaml',
+
 }
 
 function getFileIcon(type: string) {
-  return iconMap[type] ?? Document
+  return iconMap[type] ?? 'vscode-icons:default-file'
 }
 
 function hasDiskInfo(info: RawDiskInfo) {
@@ -304,6 +319,7 @@ const customColor = (precentage: number): string => {
       :props="treeProps"
       :default-expanded-keys="expandedKeys"
       :height="treeHeight"
+      :expand-on-click-node="false"
       @node-click="handleNodeClick"
       @node-expand="handleNodeExpand"
       @node-collapse="handleNodeCollapse"
@@ -311,20 +327,16 @@ const customColor = (precentage: number): string => {
       <template #default="{ node, data }">
         <div class="tree-node">
           <div v-if="data.type === 'monitor'">
-            <el-icon>
-              <Monitor />
-            </el-icon>
+          <Icon icon="line-md:computer-twotone" style="height: 15px; width: 15px;"/>
           </div>
           <div v-else-if="data.type === 'disk'">
-            <Icon icon="fluent:hard-drive-48-regular" />
+            <Icon icon="icon-park-twotone:hard-disk" style="height: 15px; width: 15px;"/>
           </div>
           <div v-else-if="data.type === 'folder'">
-            <el-icon>
-              <Folder />
-            </el-icon>
+            <Icon icon="glyphs-poly:folder" style="height: 16px; width: 16px;"/>
           </div>
           <div v-else>
-            <Icon :icon="getFileIcon(data.type)"/>
+            <Icon :icon="getFileIcon(data.type)" style="height: 15px; width: 15px;"/>
           </div>
           <span>{{ node.label }}</span>
         </div>
