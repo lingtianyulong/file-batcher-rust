@@ -1,48 +1,43 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-  import { CloseBold } from "@element-plus/icons-vue";
+import { invoke } from "@tauri-apps/api/core";
 
-  const props = defineProps<{
-    modelValue: boolean;
-  }>();
-
-  const emit = defineEmits<{
-    (e: "update:modelValue", value: boolean): void;
-  }>();
-
-  const visible = computed({
-    get: () => props.modelValue,
-    set: (value: boolean) => emit("update:modelValue", value),
-  });
-
-  function closeDialog() {
-    visible.value = false;
+async function handleBack() {
+  try {
+    await invoke("close_search_config_window_command");
+  } catch (error) {
+    console.error("关闭搜索配置窗口失败:", error);
   }
+}
 </script>
 
 <template>
-  <el-dialog
+  <div class="search-config-page">
+     <el-button @click="handleBack">返回</el-button>
+
+  </div>
+  <!-- <el-dialog
     v-model="visible"
     align-center
     class="search-config-dialog"
     title="搜索配置"
     show-close
-  >
+    draggable
+  > -->
     <!-- <div class="title_bar">
       <div class="title_bar_title">搜索配置</div>
       <el-button :icon="CloseBold" @click="closeDialog" />
     </div> -->
-  </el-dialog>
+  <!-- </el-dialog> -->
   <!-- <div class="search-page">
     <h1>搜索配置</h1>
   </div> -->
 </template>
 
 <style scoped>
-  .search-config-dialog {
+  .search-config-page {
     flex-direction: column;
-    width: 1000px;
-    height: 800px;
+    width: 100%;
+    height: 100%;
   }
 
   .title_bar {

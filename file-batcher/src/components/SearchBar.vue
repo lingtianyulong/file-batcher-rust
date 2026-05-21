@@ -3,11 +3,10 @@
   import { open, message } from "@tauri-apps/plugin-dialog";
   import { ref, onMounted, watch } from "vue";
   import { useFolderStore } from "../stores/file-store";
-  import SearchConfig from "../pages/SearchConfig.vue";
+  import { invoke } from "@tauri-apps/api/core";
 
   const folderStore = useFolderStore();
   const folderPath = ref("");
-  const searchConfigVisible = ref(false);
 
   onMounted(() => {
     folderPath.value = folderStore.currentPath;
@@ -43,7 +42,14 @@
   }
 
   async function handleOpenSearchConfig() {
-    searchConfigVisible.value = true;
+    try {
+      await invoke("open_search_config_window_command");
+    } catch (error) {
+      await message(`打开搜索配置失败：${String(error)}`, {
+        title: "错误",
+        kind: "error",
+      });
+    }
   }
 </script>
 
@@ -95,7 +101,6 @@
         />
       </el-tooltip>
     </div>
-    <SearchConfig v-model="searchConfigVisible" />
   </div>
 </template>
 

@@ -2,11 +2,7 @@
 
 import { onMounted, onUnmounted } from "vue";
 import "element-plus/dist/index.css";
-import TitleBar from "./components/TitleBar.vue";
 import {invoke} from "@tauri-apps/api/core";
-import MenuBar from "./components/MenuBar.vue";
-import MainPage from "./pages/MainPage.vue";
-import SearchBar from "./components/SearchBar.vue";
 
 const handleContextMenu = async (event: MouseEvent) => {
   event.preventDefault();
@@ -24,64 +20,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <main class="page">
-    <TitleBar />
-    <MenuBar />
-    <SearchBar />
-    <MainPage />
-  </main>
+  <router-view />
 </template>
 
-<style scoped>
-.page {
-  height: 100vh;
-  padding: 0;
-  background: #ffffff;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.layout {
-  flex: 1;
-  overflow: hidden;
-}
-
-
-.menu {
-  border-right: none;
-  --el-menu-bg-color: #ffffff;
-  --el-menu-text-color: #2c3e50;
-  --el-menu-active-color: #1a6fc4;
-  --el-menu-hover-bg-color: #f5f7fa;
-  --el-menu-active-bg-color: #ecf5ff;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  overflow: hidden;
-}
-
-.card {
-  width: 100%;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.batch-window-content {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-</style>
 
 <style>
 html,

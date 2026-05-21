@@ -16,3 +16,4 @@ export const useFolderStore = defineStore('folder', {
         }
     }
 })
+

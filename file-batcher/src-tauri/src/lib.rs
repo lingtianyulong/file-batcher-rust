@@ -86,6 +86,8 @@ pub fn run() {
                 get_disk_list_command,
                 get_disk_info_command,
                 get_dir_info_command,
+                open_search_config_window_command,
+                close_search_config_window_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
