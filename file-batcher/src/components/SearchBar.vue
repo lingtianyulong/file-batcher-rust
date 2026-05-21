@@ -71,8 +71,22 @@
         :icon="icons.FolderOpened"
         @click="handleOpenFolder"
       />
+      <el-tooltip
+        content="搜索文件"
+        placement="bottom"
+        effect="light"
+        popper-class="search-tooltip"
+      >
+        <el-button
+          type="default"
+          style="font-size: 16px; background-color: transparent"
+          size="default"
+          :icon="icons.Search"
+          @click="handleOpenSearchConfig"
+        />
+      </el-tooltip>
     </div>
-    <div class="open-folder">
+    <!-- <div class="open-folder">
       <el-lable class="lable">搜索条件</el-lable>
       <el-input
         type="text"
@@ -84,7 +98,6 @@
         style="font-size: 16px; background-color: transparent"
         size="default"
         :icon="icons.Search"
-        @click="handleOpenSearchConfig"
       />
       <el-tooltip
         content="设置搜索选项"
@@ -100,7 +113,7 @@
           @click="handleOpenSearchConfig"
         />
       </el-tooltip>
-    </div>
+    </div> -->
   </div>
 </template>
 

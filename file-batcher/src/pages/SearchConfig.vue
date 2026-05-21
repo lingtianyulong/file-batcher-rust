@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import TitleBar from "../components/TitleBar.vue";
+// import { invoke } from "@tauri-apps/api/core";
 
-async function handleBack() {
-  try {
-    await invoke("close_search_config_window_command");
-  } catch (error) {
-    console.error("关闭搜索配置窗口失败:", error);
-  }
-}
+// async function handleBack() {
+//   try {
+//     await invoke("close_search_config_window_command");
+//   } catch (error) {
+//     console.error("关闭搜索配置窗口失败:", error);
+//   }
+// }
 </script>
 
 <template>
   <div class="search-config-page">
-     <el-button @click="handleBack">返回</el-button>
+    <TitleBar title="搜索条件" />
 
   </div>
   <!-- <el-dialog
@@ -35,9 +36,11 @@ async function handleBack() {
 
 <style scoped>
   .search-config-page {
+    display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
+    overflow: hidden;
   }
 
   .title_bar {

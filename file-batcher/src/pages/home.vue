@@ -7,7 +7,7 @@ import MainPage from "./MainPage.vue";
 
 <template>
   <main class="page">
-    <TitleBar />
+    <TitleBar title="FileBatcher" />
     <MenuBar />
     <SearchBar />
     <MainPage />
