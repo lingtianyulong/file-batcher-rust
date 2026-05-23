@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import { CloseBold } from "@element-plus/icons-vue";
 
   const props = defineProps<{
     modelValue: boolean;
@@ -14,10 +13,6 @@
     get: () => props.modelValue,
     set: (value: boolean) => emit("update:modelValue", value),
   });
-
-  function closeDialog() {
-    visible.value = false;
-  }
 </script>
 
 <template>
