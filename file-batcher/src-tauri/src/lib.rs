@@ -16,6 +16,7 @@ use commands::diskinfo_commands::*;
 use commands::directory_commands::*;
 use login::commands::login_command;
 use register::{ register_command, DB_URL };
+use tauri::Emitter;
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -58,10 +59,15 @@ pub fn run() {
         };
 
         tauri::Builder::default()
-
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
             window.show()?;
+            // 监听菜单事件, 向前端发送菜单事件
+            app.on_menu_event(move |handle, event| {
+                if let Err(error) = handle.emit("menu_event", event.id()) {
+                    log::error!("failed to emit menu event: {error}");
+                }
+            });
 
             Ok(())
         })
