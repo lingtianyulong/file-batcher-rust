@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import { computed } from "vue";
+import TitleBar from "../components/TitleBar.vue";
+// import { invoke } from "@tauri-apps/api/core";
 
   const props = defineProps<{
     modelValue: boolean;
@@ -16,28 +18,35 @@
 </script>
 
 <template>
-  <el-dialog
+  <div class="search-config-page">
+    <TitleBar title="搜索条件" />
+
+  </div>
+  <!-- <el-dialog
     v-model="visible"
     align-center
     class="search-config-dialog"
     title="搜索配置"
     show-close
-  >
+    draggable
+  > -->
     <!-- <div class="title_bar">
       <div class="title_bar_title">搜索配置</div>
       <el-button :icon="CloseBold" @click="closeDialog" />
     </div> -->
-  </el-dialog>
+  <!-- </el-dialog> -->
   <!-- <div class="search-page">
     <h1>搜索配置</h1>
   </div> -->
 </template>
 
 <style scoped>
-  .search-config-dialog {
+  .search-config-page {
+    display: flex;
     flex-direction: column;
-    width: 1000px;
-    height: 800px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
   .title_bar {

@@ -3,11 +3,10 @@
   import { open, message } from "@tauri-apps/plugin-dialog";
   import { ref, onMounted, watch } from "vue";
   import { useFolderStore } from "../stores/file-store";
-  import SearchConfig from "../pages/SearchConfig.vue";
+  import { invoke } from "@tauri-apps/api/core";
 
   const folderStore = useFolderStore();
   const folderPath = ref("");
-  const searchConfigVisible = ref(false);
 
   onMounted(() => {
     folderPath.value = folderStore.currentPath;
@@ -43,7 +42,14 @@
   }
 
   async function handleOpenSearchConfig() {
-    searchConfigVisible.value = true;
+    try {
+      await invoke("open_search_config_window_command");
+    } catch (error) {
+      await message(`打开搜索配置失败：${String(error)}`, {
+        title: "错误",
+        kind: "error",
+      });
+    }
   }
 </script>
 
@@ -65,8 +71,22 @@
         :icon="icons.FolderOpened"
         @click="handleOpenFolder"
       />
+      <el-tooltip
+        content="搜索文件"
+        placement="bottom"
+        effect="light"
+        popper-class="search-tooltip"
+      >
+        <el-button
+          type="default"
+          style="font-size: 16px; background-color: transparent"
+          size="default"
+          :icon="icons.Search"
+          @click="handleOpenSearchConfig"
+        />
+      </el-tooltip>
     </div>
-    <div class="open-folder">
+    <!-- <div class="open-folder">
       <el-lable class="lable">搜索条件</el-lable>
       <el-input
         type="text"
@@ -78,7 +98,6 @@
         style="font-size: 16px; background-color: transparent"
         size="default"
         :icon="icons.Search"
-        @click="handleOpenSearchConfig"
       />
       <el-tooltip
         content="设置搜索选项"
@@ -94,8 +113,7 @@
           @click="handleOpenSearchConfig"
         />
       </el-tooltip>
-    </div>
-    <SearchConfig v-model="searchConfigVisible" />
+    </div> -->
   </div>
 </template>
 

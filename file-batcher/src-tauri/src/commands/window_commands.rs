@@ -54,3 +54,45 @@ pub async fn close_batch_window_command(app: AppHandle) -> Result<(), String> {
     }
     Ok(())
 }
+
+#[tauri::command]
+pub async fn open_search_config_window_command(app: AppHandle) -> Result<(), String> {
+    log::info!("open_search_config_window_command invoked");
+    if let Some(existing) = app.get_webview_window("search-config") {
+        log::info!("search-config window already exists, focusing");
+        existing.show().map_err(|e| e.to_string())?;
+        existing.set_focus().map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+
+    let window =
+        WebviewWindowBuilder::new(&app, "search-config", WebviewUrl::App("index.html#/search-config".into()))
+            .title("搜索配置")
+            .inner_size(1000.0, 800.0)
+            .min_inner_size(640.0, 480.0)
+            .decorations(false)
+            .transparent(false)
+            .resizable(true)
+            .center()
+            .visible(false)
+            .build()
+            .map_err(|e| {
+                log::error!("failed to build search-config window: {}", e);
+                e.to_string()
+            })?;
+
+    window.show().map_err(|e| e.to_string())?;
+    window.set_focus().map_err(|e| e.to_string())?;
+
+    log::info!("search-config window created successfully");
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn close_search_config_window_command(app: AppHandle) -> Result<(), String> {
+    log::info!("close_search_config_window_command invoked");
+    if let Some(window) = app.get_webview_window("search-config") {
+        window.close().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}

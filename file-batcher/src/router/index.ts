@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 
 const EmptyRouteView = {
   template: '<div></div>',
@@ -14,7 +14,7 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: EmptyRouteView,
+      component: () => import('../pages/home.vue'),
     },
     {
       path: '/settings',
@@ -24,7 +24,12 @@ const router = createRouter({
     {
       path: '/batch',
       name: 'batch',
-      component: EmptyRouteView,
+      component: () => import('../pages/batch.vue'),
+    },
+    {
+      path: '/search-config',
+      name: 'search-config',
+      component: () => import('../pages/SearchConfig.vue'),
     },
   ],
 });

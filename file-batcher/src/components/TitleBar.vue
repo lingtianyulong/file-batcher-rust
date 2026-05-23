@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import appIcon from "../assets/icon.png";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const appWindow = getCurrentWindow();
 const isMaximized = ref(false);
+const title = computed(() => props.title);
+const props = defineProps<{
+  title: string;
+}>();
+
+
 
 async function updateMaximized() {
   isMaximized.value = await appWindow.isMaximized();
@@ -35,7 +41,7 @@ onMounted(async () => {
   <div class="titlebar" data-tauri-drag-region>
     <div class="titlebar-title" data-tauri-drag-region>
       <img :src="appIcon" class="titlebar-icon" alt="icon" data-tauri-drag-region />
-      <span class="titlebar-app-name" data-tauri-drag-region>FileBatcher</span>
+      <span class="titlebar-app-name" data-tauri-drag-region>{{ title }}</span>
     </div>
     <div class="titlebar-controls">
       <button class="titlebar-btn btn-minimize" @click="minimize" title="最小化">
