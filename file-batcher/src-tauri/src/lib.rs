@@ -93,7 +93,14 @@ pub fn run() {
                 get_disk_info_command,
                 get_dir_info_command,
                 open_search_config_window_command,
-                close_search_config_window_command
+                close_search_config_window_command,
+                open_file_command,
+                open_folder_command,
+                cut_command,
+                copy_command,
+                paste_command,
+                rename_command,
+                delete_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

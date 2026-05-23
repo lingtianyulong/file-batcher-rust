@@ -33,3 +33,43 @@ pub fn show_contextmenu_command(window: Window, x: f64, y: f64) -> Result<(), St
         .map_err(|e| e.to_string())?;
     Ok(())
 }
+
+#[tauri::command]
+pub fn open_file_command(file_path: &str) -> Result<(), String> {
+    // let path = Path::new(file_path);
+    // let _ = open_path(path);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn open_folder_command(folder_path: &str) -> Result<(), String> {
+    // let path = Path::new(folder_path);
+    // let _ = open_path(path);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn cut_command(window: Window) -> Result<(), String> {
+    Ok(())
+}
+
+#[tauri::command]
+pub fn copy_command(window: Window) -> Result<(), String> {
+    Ok(())
+}
+
+#[tauri::command]
+pub fn paste_command(window: Window) -> Result<(), String> {
+    Ok(())
+}
+
+#[tauri::command]
+pub fn rename_command(window: Window) -> Result<(), String> {
+    Ok(())
+}
+
+#[tauri::command]
+pub fn delete_command(window: Window) -> Result<(), String> {
+    Ok(())
+}
+
