@@ -12,6 +12,7 @@
 
   const folderStore = useFolderStore();
   const loading = ref(false);
+  const currentSelectedRow = ref<FileInfoRow | null>(null);
 
   type FileInfoRow = {
     fileName: string;
@@ -106,13 +107,17 @@
       });
     }
 
-    unlistenMenuEvent = await listen("menu_event", (event) => {
+    unlistenMenuEvent = await listen("menu_event", async (event) => {
       console.log("menu event in main page", event);
       const command = event.payload as string;
       switch (command) {
         case "open":
           console.log("open command in main page", command);
-          //   handleOpen(event.payload as string);
+          if (currentSelectedRow.value) {
+            const filePath = await join(currentSelectedRow.value.filePath, currentSelectedRow.value.fileName);
+            console.log("open command in main page filePath", filePath);
+            await openPath(filePath);
+          }
           break;
         case "open_folder":
           console.log("open_folder command in main page", command);
@@ -153,10 +158,13 @@
   ) {
     event.preventDefault();
     console.log("handleCellContextmenu", row, column, event);
+    currentSelectedRow.value = row;
     // 暂时使用系统菜单实现, 后续再使用 Floating UI 实现
     invoke("show_contextmenu_command", {
       x: event.clientX,
       y: event.clientY,
+    }).finally(() => {
+      currentSelectedRow.value = null;
     });
   }
 </script>
