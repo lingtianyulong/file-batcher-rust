@@ -300,13 +300,8 @@
     }
   }
 
-  /** 节点展开事件 */
-  async function handleNodeExpand(node: TreeNode) {
+  async function loadNodeChildren(node: TreeNode) {
     if (node.type !== "disk" && node.type !== "folder") {
-      return;
-    }
-    ensureExpanded(node.id);
-    if (node.loaded) {
       return;
     }
     const dirPath = node.path ?? node.label;
@@ -341,6 +336,31 @@
       console.error("get_dir_info_command failed", e);
     }
   }
+
+  /** 重新加载已在树中展开的目录节点（用于剪切粘贴后刷新） */
+  async function refreshDirectories(dirPaths: string[]) {
+    const uniquePaths = [...new Set(dirPaths.filter((p) => p.length > 0))];
+    for (const dirPath of uniquePaths) {
+      const node = findNodeById(treeData.value, dirPath);
+      if (node) {
+        await loadNodeChildren(node);
+      }
+    }
+  }
+
+  /** 节点展开事件 */
+  async function handleNodeExpand(node: TreeNode) {
+    if (node.type !== "disk" && node.type !== "folder") {
+      return;
+    }
+    ensureExpanded(node.id);
+    if (node.loaded) {
+      return;
+    }
+    await loadNodeChildren(node);
+  }
+
+  defineExpose({ refreshDirectories });
 
   /** 节点收起事件 */
   function handleNodeCollapse(node: TreeNode) {

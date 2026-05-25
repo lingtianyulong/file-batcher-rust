@@ -65,21 +65,24 @@ pub async fn open_search_config_window_command(app: AppHandle) -> Result<(), Str
         return Ok(());
     }
 
-    let window =
-        WebviewWindowBuilder::new(&app, "search-config", WebviewUrl::App("index.html#/search-config".into()))
-            .title("搜索配置")
-            .inner_size(1000.0, 800.0)
-            .min_inner_size(640.0, 480.0)
-            .decorations(false)
-            .transparent(false)
-            .resizable(true)
-            .center()
-            .visible(false)
-            .build()
-            .map_err(|e| {
-                log::error!("failed to build search-config window: {}", e);
-                e.to_string()
-            })?;
+    let window = WebviewWindowBuilder::new(
+        &app,
+        "search-config",
+        WebviewUrl::App("index.html#/search-config".into()),
+    )
+    .title("搜索配置")
+    .inner_size(1000.0, 800.0)
+    .min_inner_size(640.0, 480.0)
+    .decorations(false)
+    .transparent(false)
+    .resizable(true)
+    .center()
+    .visible(false)
+    .build()
+    .map_err(|e| {
+        log::error!("failed to build search-config window: {}", e);
+        e.to_string()
+    })?;
 
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;

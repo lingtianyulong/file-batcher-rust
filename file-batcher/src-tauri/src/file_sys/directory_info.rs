@@ -1,21 +1,22 @@
-use std::{os::windows::fs::MetadataExt, path::Path};
 use serde::{Deserialize, Serialize};
+use std::{os::windows::fs::MetadataExt, path::Path};
 use windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_HIDDEN;
-
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DirFileInfo {
-    name: String,           // 目录名称
-    path: String,           // 目录路径
-    is_dir: bool,           // 是否是目录
-    has_sub_dir: bool,      // 是否包含子目录
-    sub_dirs: Vec<DirFileInfo>,  // 子目录
-    file_type: Option<String>,   // 文件类型
+    name: String,               // 目录名称
+    path: String,               // 目录路径
+    is_dir: bool,               // 是否是目录
+    has_sub_dir: bool,          // 是否包含子目录
+    sub_dirs: Vec<DirFileInfo>, // 子目录
+    file_type: Option<String>,  // 文件类型
 }
 
 impl DirFileInfo {
-    pub fn get_dir_info(dir_path: &str) -> Result<DirFileInfo, Box<dyn std::error::Error + 'static>> {
+    pub fn get_dir_info(
+        dir_path: &str,
+    ) -> Result<DirFileInfo, Box<dyn std::error::Error + 'static>> {
         log::info!("get_dir_info, the dir path is {}", dir_path);
         let normalized_path = if dir_path.ends_with(':') {
             format!(r"{}\", dir_path)
@@ -24,8 +25,14 @@ impl DirFileInfo {
         };
         let path = Path::new(&normalized_path);
         if !path.is_dir() {
-            log::error!("get_dir_info, the dir path not found, the dir path is {}", dir_path);
-            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, "Directory not found")));
+            log::error!(
+                "get_dir_info, the dir path not found, the dir path is {}",
+                dir_path
+            );
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "Directory not found",
+            )));
         }
 
         let dir_name = path
@@ -72,13 +79,12 @@ impl DirFileInfo {
                 dir_info.has_sub_dir = true;
             }
 
-            let file_type = entry_path.extension().map(|ext| ext.to_string_lossy().to_lowercase());
+            let file_type = entry_path
+                .extension()
+                .map(|ext| ext.to_string_lossy().to_lowercase());
 
             let display_path = entry_path.display().to_string();
-            let entry_name = entry
-                .file_name()
-                .to_string_lossy()
-                .into_owned();
+            let entry_name = entry.file_name().to_string_lossy().into_owned();
 
             dir_info.sub_dirs.push(DirFileInfo {
                 name: entry_name,
@@ -89,7 +95,6 @@ impl DirFileInfo {
                 has_sub_dir: is_entry_dir,
                 sub_dirs: Vec::new(),
             });
-
         }
 
         log::info!(

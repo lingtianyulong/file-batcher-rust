@@ -1,25 +1,25 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
-mod common;
 mod commands;
+mod common;
+mod disks;
 mod file_sys;
 mod login;
 mod register;
-mod disks;
 
 use chrono::Local;
 use commands::button_commands::*;
-use commands::file_info_commands::*;
 use commands::contextmenu_commands::*;
-use commands::window_commands::*;
-use commands::diskinfo_commands::*;
 use commands::directory_commands::*;
+use commands::diskinfo_commands::*;
+use commands::file_info_commands::*;
+use commands::window_commands::*;
+use commands::file_op_commands::*;
 use login::commands::login_command;
-use register::{ register_command, DB_URL };
+use register::{DB_URL, register_command};
 use tauri::Emitter;
 use tauri::Manager;
 use tauri_plugin_sql::{Migration, MigrationKind};
-
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -43,22 +43,23 @@ pub fn run() {
         ))
         .build();
 
-        let migration = Migration{
-            version: 1,
-            description: "Initial migration",
-            sql: concat!(
-                "CREATE TABLE users (",
-                "id TEXT PRIMARY KEY NOT NULL, ",
-                "username TEXT NOT NULL, ",
-                "password TEXT NOT NULL, ",
-                "create_time TEXT, ",
-                "update_time TEXT",
-                ")"
-            ),
-            kind: MigrationKind::Up,
-        };
+    let migration = Migration {
+        version: 1,
+        description: "Initial migration",
+        sql: concat!(
+            "CREATE TABLE users (",
+            "id TEXT PRIMARY KEY NOT NULL, ",
+            "username TEXT NOT NULL, ",
+            "password TEXT NOT NULL, ",
+            "create_time TEXT, ",
+            "update_time TEXT",
+            ")"
+        ),
+        kind: MigrationKind::Up,
+    };
 
-        tauri::Builder::default()
+    tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
             window.show()?;
@@ -79,21 +80,21 @@ pub fn run() {
                 .add_migrations(DB_URL, vec![migration])
                 .build(),
         )
-        .invoke_handler(
-            tauri::generate_handler![
-                get_file_info_command,
-                get_file_list_command,
-                rename_file_command,
-                open_batch_window_command,
-                close_batch_window_command,
-                show_contextmenu_command,
-                login_command,
-                register_command,
-                get_disk_list_command,
-                get_disk_info_command,
-                get_dir_info_command,
-                open_search_config_window_command,
-                close_search_config_window_command,
+        .invoke_handler(tauri::generate_handler![
+            get_file_info_command,
+            get_file_list_command,
+            rename_file_command,
+            open_batch_window_command,
+            close_batch_window_command,
+            show_contextmenu_command,
+            login_command,
+            register_command,
+            get_disk_list_command,
+            get_disk_info_command,
+            get_dir_info_command,
+            open_search_config_window_command,
+            close_search_config_window_command,
+            paste_files_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

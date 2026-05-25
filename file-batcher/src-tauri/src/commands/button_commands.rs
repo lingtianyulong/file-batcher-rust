@@ -1,6 +1,5 @@
 // 按钮命令
-use crate::file_sys::file_info::{ rename_file,
-};
+use crate::file_sys::file_info::rename_file;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 

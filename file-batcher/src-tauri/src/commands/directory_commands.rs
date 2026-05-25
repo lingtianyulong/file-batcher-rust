@@ -1,4 +1,4 @@
-use crate::file_sys::directory_info::{ DirFileInfo };
+use crate::file_sys::directory_info::DirFileInfo;
 use serde_json;
 
 #[tauri::command]

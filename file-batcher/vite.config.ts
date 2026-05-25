@@ -17,6 +17,9 @@ export default defineConfig(async () => ({
     port: 1420,
     strictPort: true,
     host: host || false,
+    esbuild: {
+      drop: ['console', 'debugger'],
+    },
     hmr: host
       ? {
           protocol: "ws",

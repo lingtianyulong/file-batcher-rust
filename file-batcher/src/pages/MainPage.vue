@@ -1,16 +1,21 @@
 <script lang="ts" setup>
   import FolderTree from "./FolderTree.vue";
   import { useFolderStore } from "../stores/file-store";
-  import { onMounted, onUnmounted, watch } from "vue";
-  import { ref } from "vue";
+  import { onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
   import { invoke } from "@tauri-apps/api/core";
   import * as icons from "@element-plus/icons-vue";
   import { message } from "@tauri-apps/plugin-dialog";
-  import { join } from "@tauri-apps/api/path";
+  import { dirname, join } from "@tauri-apps/api/path";
   import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
   import { listen } from "@tauri-apps/api/event";
+  import { FileClipboardService } from "../services/file/file-clipboard-service";
+  import { useClipboardStore } from "../stores/clipboard-store";
 
   const folderStore = useFolderStore();
+  const clipboardStore = useClipboardStore();
+  const folderTreeRef = useTemplateRef<{
+    refreshDirectories: (dirPaths: string[]) => Promise<void>;
+  }>("folderTreeRef");
   const loading = ref(false);
   const currentSelectedRow = ref<FileInfoRow | null>(null);
 
@@ -108,33 +113,68 @@
     }
 
     unlistenMenuEvent = await listen("menu_event", async (event) => {
-      console.log("menu event in main page", event);
       const command = event.payload as string;
       switch (command) {
         case "open":
-          console.log("open command in main page", command);
           if (currentSelectedRow.value) {
             const filePath = await join(
               currentSelectedRow.value.filePath,
               currentSelectedRow.value.fileName,
             );
-            console.log("open command in main page filePath", filePath);
             await openPath(filePath);
           }
           break;
         case "open_folder":
-          console.log(
-            "open_folder command in main page",
-            currentSelectedRow.value,
-          );
           if (currentSelectedRow.value) {
             const dirPath = await join(
               currentSelectedRow.value.filePath,
               currentSelectedRow.value.fileName,
             );
-            console.log("open_folder command in main page dirPath", dirPath);
+            // Reveal a path with the system’s default explorer
             await revealItemInDir(dirPath);
           }
+          break;
+        case "cut":
+          let cutFiles = await Promise.all(
+            selectedRows.value.map(
+              async (row) => await join(row.filePath, row.fileName),
+            ),
+          );
+          console.log("cut files", cutFiles.toString());
+          FileClipboardService.cut(cutFiles);
+          break;
+        case "copy":
+          let copyFiles = await Promise.all(
+            selectedRows.value.map(
+              async (row) => await join(row.filePath, row.fileName),
+            ),
+          );
+          console.log("copy files", copyFiles.toString());
+          FileClipboardService.copy(copyFiles);
+          break;
+        case "paste": {
+          const targetPath = folderStore.currentPath;
+          const isCut = clipboardStore.mode === "cut";
+          const sources = [...clipboardStore.files];
+          loading.value = true;
+          try {
+            await FileClipboardService.paste(targetPath);
+            await loadFileList(targetPath);
+            if (isCut && folderTreeRef.value) {
+              const dirsToRefresh = new Set<string>([targetPath]);
+              for (const source of sources) {
+                dirsToRefresh.add(await dirname(source));
+              }
+              await folderTreeRef.value.refreshDirectories([...dirsToRefresh]);
+            }
+          } finally {
+            loading.value = false;
+          }
+          break;
+        }
+        case "rename":
+          break;
+        case "delete":
           break;
       }
     });
@@ -158,12 +198,6 @@
     },
   );
 
-  //   const unlisten = await listen("menu_event", (event) => {
-  //     listen("menu_event", (event) => {
-  //       console.log("menu event in main page", event);
-  //     });
-  //   });
-
   function handleRowContextmenu(
     row: FileInfoRow,
     column: any,
@@ -185,7 +219,7 @@
 <template>
   <el-container class="main-page-root">
     <el-aside class="left-siderbar siderbar">
-      <FolderTree />
+      <FolderTree ref="folderTreeRef" />
     </el-aside>
     <el-container class="main-page-right">
       <el-main class="main-page-main">

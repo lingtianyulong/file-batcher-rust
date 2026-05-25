@@ -1,5 +1,5 @@
-use sysinfo::Disks;
 use serde::{Deserialize, Serialize};
+use sysinfo::Disks;
 
 const BYTES_PER_GB: f64 = 1024.0 * 1024.0 * 1024.0;
 
@@ -34,7 +34,9 @@ impl DiskInfo {
         Ok(disk_info_list)
     }
 
-    pub fn get_disk_info(disk_name: &str) -> Result<DiskInfo, Box<dyn std::error::Error + 'static>> {
+    pub fn get_disk_info(
+        disk_name: &str,
+    ) -> Result<DiskInfo, Box<dyn std::error::Error + 'static>> {
         let disk_list = Disks::new_with_refreshed_list();
         let target = String::from(disk_name) + "\\";
 
@@ -52,6 +54,9 @@ impl DiskInfo {
             }
         }
 
-        Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, format!("Disk not found: {}", disk_name))))
+        Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            format!("Disk not found: {}", disk_name),
+        )))
     }
 }

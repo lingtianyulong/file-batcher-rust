@@ -1,4 +1,4 @@
-use crate::file_sys::file_info::{ get_file_info, get_file_list };
+use crate::file_sys::file_info::{get_file_info, get_file_list};
 
 #[tauri::command]
 pub fn get_file_info_command(file_path: &str) -> Result<String, String> {
@@ -23,9 +23,7 @@ pub fn get_file_info_command(file_path: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn get_file_list_command(
-    file_path: &str
-) -> Result<String, String> {
+pub fn get_file_list_command(file_path: &str) -> Result<String, String> {
     log::info!("get_file_list_command, the file path is {}", file_path);
     let file_list = match get_file_list(file_path) {
         Ok(file_list) => file_list,

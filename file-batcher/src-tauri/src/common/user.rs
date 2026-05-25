@@ -1,16 +1,16 @@
 use chrono::Local;
-use uuid::{Uuid, Timestamp};
+use uuid::{Timestamp, Uuid};
 
 /**
  * 用户
  */
 #[allow(dead_code)]
- pub struct User {
-    pub id: String,                // 用户ID
-    pub username: String,               // 用户名
-    pub password: String,               // 用户密码
-    pub create_time: Option<String>,    // 创建时间
-    pub update_time: Option<String>,    // 更新时间
+pub struct User {
+    pub id: String,                  // 用户ID
+    pub username: String,            // 用户名
+    pub password: String,            // 用户密码
+    pub create_time: Option<String>, // 创建时间
+    pub update_time: Option<String>, // 更新时间
 }
 
 impl User {
