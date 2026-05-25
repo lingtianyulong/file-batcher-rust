@@ -7,7 +7,7 @@
   import * as icons from "@element-plus/icons-vue";
   import { message } from "@tauri-apps/plugin-dialog";
   import { join } from "@tauri-apps/api/path";
-  import { openPath } from "@tauri-apps/plugin-opener";
+  import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
   import { listen } from "@tauri-apps/api/event";
 
   const folderStore = useFolderStore();
@@ -114,14 +114,27 @@
         case "open":
           console.log("open command in main page", command);
           if (currentSelectedRow.value) {
-            const filePath = await join(currentSelectedRow.value.filePath, currentSelectedRow.value.fileName);
+            const filePath = await join(
+              currentSelectedRow.value.filePath,
+              currentSelectedRow.value.fileName,
+            );
             console.log("open command in main page filePath", filePath);
             await openPath(filePath);
           }
           break;
         case "open_folder":
-          console.log("open_folder command in main page", command);
-          //   handleOpenFolder(event.payload as string);
+          console.log(
+            "open_folder command in main page",
+            currentSelectedRow.value,
+          );
+          if (currentSelectedRow.value) {
+            const dirPath = await join(
+              currentSelectedRow.value.filePath,
+              currentSelectedRow.value.fileName,
+            );
+            console.log("open_folder command in main page dirPath", dirPath);
+            await revealItemInDir(dirPath);
+          }
           break;
       }
     });
