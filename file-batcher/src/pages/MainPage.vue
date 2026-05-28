@@ -10,6 +10,7 @@
   import { listen } from "@tauri-apps/api/event";
   import { FileClipboardService } from "../services/file/file-clipboard-service";
   import { useClipboardStore } from "../stores/clipboard-store";
+  import { ElMessageBox } from "element-plus";
 
   const folderStore = useFolderStore();
   const clipboardStore = useClipboardStore();
@@ -175,6 +176,17 @@
         case "rename":
           break;
         case "delete":
+          ElMessageBox.confirm("确定删除选中的文件吗？", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }).then(async () => {
+            const deleteFiles = await Promise.all(
+              selectedRows.value.map(
+                async (row) => await join(row.filePath, row.fileName),
+              ),
+            );
+          });
           break;
       }
     });
