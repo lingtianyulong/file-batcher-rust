@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "@floating-ui/vue": "^1.1.11",
     "@iconify-vue/fluent": "^1.0.5",
     "@iconify-vue/glyphs-poly": "^1.0.2",

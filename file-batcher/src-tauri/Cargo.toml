@@ -36,6 +36,7 @@ sysinfo = "0.39.2"
 walkdir = "2.5.0"
 tauri-plugin-fs = "2"
 rayon = "1.12.0"
+trash = "5.2.6"
 
 
 [target.'cfg(target_os = "windows")'.dependencies]

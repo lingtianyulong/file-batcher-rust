@@ -8,3 +8,12 @@ pub async fn paste_files_command(sources: Vec<String>, target: &str, is_cut: boo
         Err(e) => Err(e.to_string().into()),
     }
 }
+
+#[tauri::command]
+pub async fn delete_files_command(sources: Vec<String>) -> Result<(), String> {
+    let result = FileOp::delete_files(sources);
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string().into()),
+    }
+}

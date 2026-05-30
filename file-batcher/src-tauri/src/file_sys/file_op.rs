@@ -91,5 +91,27 @@ impl FileOp {
         Ok(())
     }
 
-
+    pub fn delete_files(sources: Vec<String>) -> Result<(), Box<dyn std::error::Error + 'static>> {
+        sources.par_iter().try_for_each(|source| -> std::io::Result<()> {
+            let source_path = Path::new(source);
+            if source_path.is_dir() {
+                match trash::delete_all(source_path) {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        log::error!("delete file failed, the error is {}", e.to_string());
+                        Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+                    }
+                }
+            } else {
+                match trash::delete(source_path) {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        log::error!("delete file failed, the error is {}", e.to_string());
+                        Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+                    }
+                }
+            }
+        })?;
+        Ok(())
+    }
 }

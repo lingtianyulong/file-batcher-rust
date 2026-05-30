@@ -95,6 +95,7 @@ pub fn run() {
             open_search_config_window_command,
             close_search_config_window_command,
             paste_files_command,
+            delete_files_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
