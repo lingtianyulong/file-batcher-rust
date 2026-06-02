@@ -7,11 +7,9 @@
   import { basename, dirname, join, extname } from "@tauri-apps/api/path";
   import { reactive } from "vue";
   import { ElMessage } from "element-plus";
-  // import { N } from "vue-router/dist/index-BQLwgiyK.js";
 
   const oldFilePath = ref<string>("");
   const oldFileName = ref<string>("");
-  // const newFileName = ref<string>("");
 
   const formData = reactive({
     fileDir: "",
@@ -21,8 +19,6 @@
   });
 
   let unlisten: (() => void) | undefined;
-  const isComposingNewFileName = ref(false);
-  const skipNextEnterAfterComposition = ref(false);
 
   onMounted(async () => {
     console.log("onMounted in rename page");
