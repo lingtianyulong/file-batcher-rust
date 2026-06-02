@@ -10,7 +10,6 @@
   import { listen } from "@tauri-apps/api/event";
   import { FileClipboardService } from "../services/file/file-clipboard-service";
   import { useClipboardStore } from "../stores/clipboard-store";
-  import { ElMessageBox } from "element-plus";
   import { confirm } from "@tauri-apps/plugin-dialog";
 
   const folderStore = useFolderStore();
@@ -175,6 +174,19 @@
           break;
         }
         case "rename":
+          console.log("rename", currentSelectedRow.value);
+          if (currentSelectedRow.value) {
+            const filePath = await join(
+              currentSelectedRow.value.filePath,
+              currentSelectedRow.value.fileName,
+            );
+            console.log("old file path", filePath);
+            await invoke("open_rename_window_command", {
+              oldFilePath: filePath,
+            });
+            // await invoke("request_rename_old_file_path_command");
+          }
+          // await invoke("open_rename_window_command");
           break;
         case "delete":
           const confirmed = await confirm("确定删除选中的文件吗？", {

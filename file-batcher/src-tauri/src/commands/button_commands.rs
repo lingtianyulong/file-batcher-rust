@@ -1,5 +1,4 @@
 // 按钮命令
-use crate::file_sys::file_info::rename_file;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
@@ -42,36 +41,3 @@ fn emit_file_list_progress(
     }
 }
 
-#[tauri::command]
-pub fn rename_file_command(
-    file_dir: &str,
-    old_file_name: &str,
-    new_file_name: &str,
-) -> Result<String, String> {
-    log::info!(
-        "rename_file_command, file_dir is {}, old_file_name is {}, new_file_name is {}",
-        file_dir,
-        old_file_name,
-        new_file_name
-    );
-    let file_info = match rename_file(file_dir, old_file_name, new_file_name) {
-        Ok(file_info) => file_info,
-        Err(e) => {
-            log::error!("rename file failed, the error is {}", e);
-            return Err(e.to_string());
-        }
-    };
-
-    let json = match serde_json::to_string(&file_info) {
-        Ok(json) => json,
-        Err(e) => {
-            log::error!(
-                "convert renamed file info to json failed, the error is {}",
-                e
-            );
-            return Err(e.to_string());
-        }
-    };
-    log::info!("rename file command success, the file info is {}", json);
-    Ok(json)
-}

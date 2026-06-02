@@ -5,7 +5,8 @@
   "windows": [
     "main",
     "batch",
-    "search-config"
+    "search-config",
+    "rename"
   ],
   "permissions": [
     "core:default",
@@ -16,6 +17,8 @@
     "core:window:allow-set-focus",
     "core:window:allow-close",
     "core:window:allow-start-dragging",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
     "opener:default",
     {
       "identifier": "opener:allow-open-path",

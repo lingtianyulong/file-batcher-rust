@@ -114,4 +114,17 @@ impl FileOp {
         })?;
         Ok(())
     }
+
+    pub fn rename_file(source: &str, target: &str) -> Result<(), Box<dyn std::error::Error + 'static>> {
+        let source_path = Path::new(source);
+        let target_path = Path::new(target);
+        if !source_path.exists() {
+            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::NotFound, "File not found")));
+        }
+        if target_path.exists() {
+            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "File already exists")));
+        }
+        fs::rename(source_path, target_path)?;
+        Ok(())
+    }
 }

@@ -8,13 +8,12 @@ mod login;
 mod register;
 
 use chrono::Local;
-use commands::button_commands::*;
 use commands::contextmenu_commands::*;
 use commands::directory_commands::*;
 use commands::diskinfo_commands::*;
 use commands::file_info_commands::*;
-use commands::window_commands::*;
 use commands::file_op_commands::*;
+use commands::window_commands::*;
 use login::commands::login_command;
 use register::{DB_URL, register_command};
 use tauri::Emitter;
@@ -80,6 +79,7 @@ pub fn run() {
                 .add_migrations(DB_URL, vec![migration])
                 .build(),
         )
+        .manage(RenameWindowState::default())
         .invoke_handler(tauri::generate_handler![
             get_file_info_command,
             get_file_list_command,
@@ -96,6 +96,9 @@ pub fn run() {
             close_search_config_window_command,
             paste_files_command,
             delete_files_command,
+            open_rename_window_command,
+            request_rename_old_file_path_command,
+            close_rename_window_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

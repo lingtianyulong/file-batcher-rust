@@ -17,3 +17,12 @@ pub async fn delete_files_command(sources: Vec<String>) -> Result<(), String> {
         Err(e) => Err(e.to_string().into()),
     }
 }
+
+#[tauri::command]
+pub async fn rename_file_command(source: &str, target: &str) -> Result<(), String> {
+    let result = FileOp::rename_file(source, target);
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string().into()),
+    }
+}
