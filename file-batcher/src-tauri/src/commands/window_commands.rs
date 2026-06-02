@@ -134,7 +134,7 @@ pub async fn open_rename_window_command(app: AppHandle, old_file_path: &str) -> 
     let window =
         WebviewWindowBuilder::new(&app, "rename", WebviewUrl::App("index.html#/rename".into()))
             .title("文件重命名")
-            .inner_size(400.0, 300.0)
+            .inner_size(360.0, 250.0)
             .min_inner_size(300.0, 225.0)
             .decorations(false)
             .transparent(false)

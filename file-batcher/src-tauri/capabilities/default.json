@@ -19,6 +19,8 @@
     "core:window:allow-start-dragging",
     "core:event:allow-listen",
     "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "core:event:allow-emit-to",
     "opener:default",
     {
       "identifier": "opener:allow-open-path",

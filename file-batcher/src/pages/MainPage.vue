@@ -41,6 +41,7 @@
   const fileList = ref<FileInfoRow[]>([]);
   const selectedRows = ref<FileInfoRow[]>([]);
   let unlistenMenuEvent: (() => void) | undefined;
+  let unlistenFileRenamed: (() => void) | undefined;
 
   /** 后端 file_path 为目录路径，同目录下多文件相同，不能单独作为 row-key */
   function getRowKey(row: FileInfoRow) {
@@ -112,6 +113,21 @@
         loading.value = false;
       });
     }
+
+    unlistenFileRenamed = await listen("file_renamed", async (event) => {
+      const payload = event.payload as { file_dir?: string };
+      const fileDir = payload?.file_dir ?? "";
+      console.log("file_renamed in main page", payload);
+      loading.value = true;
+      try {
+        await loadFileList(folderStore.currentPath);
+        if (folderTreeRef.value && fileDir) {
+          await folderTreeRef.value.refreshDirectories([fileDir]);
+        }
+      } finally {
+        loading.value = false;
+      }
+    });
 
     unlistenMenuEvent = await listen("menu_event", async (event) => {
       const command = event.payload as string;
@@ -215,6 +231,8 @@
   onUnmounted(() => {
     unlistenMenuEvent?.();
     unlistenMenuEvent = undefined;
+    unlistenFileRenamed?.();
+    unlistenFileRenamed = undefined;
   });
 
   watch(

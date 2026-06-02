@@ -151,6 +151,29 @@
     return null;
   }
 
+  function normalizeTreePath(path: string) {
+    const normalized = path.replace(/\\/g, "/").replace(/\/+$/u, "");
+    return normalized.replace(/^([a-z]):/iu, (_, drive: string) => {
+      return `${drive.toUpperCase()}:`;
+    });
+  }
+
+  /** 根据路径查找节点，兼容 Windows 路径分隔符和根目录结尾差异 */
+  function findNodeByPath(nodes: TreeNode[], path: string): TreeNode | null {
+    const targetPath = normalizeTreePath(path);
+    for (const n of nodes) {
+      const nodePath = normalizeTreePath(n.path ?? n.id);
+      if (nodePath === targetPath) {
+        return n;
+      }
+      if (n.children?.length) {
+        const found = findNodeByPath(n.children, path);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
   /** 干净地折叠一个节点，连同其所有的子孙节点一同从展开列表中移出 */
   function collapseNodeAndDescendants(id: string) {
     const targetNode = findNodeById(treeData.value, id);
@@ -341,7 +364,7 @@
   async function refreshDirectories(dirPaths: string[]) {
     const uniquePaths = [...new Set(dirPaths.filter((p) => p.length > 0))];
     for (const dirPath of uniquePaths) {
-      const node = findNodeById(treeData.value, dirPath);
+      const node = findNodeByPath(treeData.value, dirPath);
       if (node) {
         await loadNodeChildren(node);
       }
