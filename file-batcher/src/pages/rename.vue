@@ -107,7 +107,7 @@
 
 <template>
   <div class="rename-page">
-    <TitleBar title="文件重命名" />
+    <TitleBar title="文件重命名" :showMinimize="false" :showMaximize="false" />
   </div>
   <div>
     <div class="old-file-name">

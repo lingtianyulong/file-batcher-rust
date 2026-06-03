@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-import TitleBar from "../components/TitleBar.vue";
-// import { invoke } from "@tauri-apps/api/core";
+  // import { computed } from "vue";
+  import TitleBar from "../components/TitleBar.vue";
+  // import { invoke } from "@tauri-apps/api/core";
 
   const props = defineProps<{
     modelValue: boolean;
@@ -11,16 +11,17 @@ import TitleBar from "../components/TitleBar.vue";
     (e: "update:modelValue", value: boolean): void;
   }>();
 
-  const visible = computed({
-    get: () => props.modelValue,
-    set: (value: boolean) => emit("update:modelValue", value),
-  });
+  // const visible = computed({
+  //   get: () => props.modelValue,
+  //   set: (value: boolean) => emit("update:modelValue", value),
+  // });
 </script>
 
 <template>
   <div class="search-config-page">
-    <TitleBar title="搜索条件" />
-
+    <div class="title-bar">
+      <TitleBar title="搜索条件" :showMinimize="true" :showMaximize="true" />
+    </div>
   </div>
   <!-- <el-dialog
     v-model="visible"
@@ -30,7 +31,7 @@ import TitleBar from "../components/TitleBar.vue";
     show-close
     draggable
   > -->
-    <!-- <div class="title_bar">
+  <!-- <div class="title_bar">
       <div class="title_bar_title">搜索配置</div>
       <el-button :icon="CloseBold" @click="closeDialog" />
     </div> -->
