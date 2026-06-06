@@ -1,5 +1,6 @@
 // 窗口命令
 use std::sync::Mutex;
+use tauri::WindowEvent;
 use tauri::{AppHandle, Emitter, Manager, State, WebviewUrl, WebviewWindowBuilder};
 
 #[derive(Default)]
@@ -64,10 +65,30 @@ pub async fn close_batch_window_command(app: AppHandle) -> Result<(), String> {
 #[tauri::command]
 pub async fn open_search_config_window_command(app: AppHandle) -> Result<(), String> {
     log::info!("open_search_config_window_command invoked");
+
+    let main_window = match app.get_webview_window("main") {
+        Some(window) => window,
+        None => return Err("main window not found".to_string()),
+    };
+    main_window.set_enabled(false).map_err(|e| e.to_string())?;
+
     if let Some(existing) = app.get_webview_window("search-config") {
         log::info!("search-config window already exists, focusing");
         existing.show().map_err(|e| e.to_string())?;
         existing.set_focus().map_err(|e| e.to_string())?;
+
+        existing.on_window_event(move |event| {
+            if let WindowEvent::Destroyed = event {
+                main_window
+                    .set_enabled(true)
+                    .map_err(|e| e.to_string())
+                    .unwrap();
+                log::info!("main window enabled");
+                main_window.set_focus().map_err(|e| e.to_string()).unwrap();
+                log::info!("main window focused");
+            }
+        });
+
         return Ok(());
     }
 
@@ -77,7 +98,7 @@ pub async fn open_search_config_window_command(app: AppHandle) -> Result<(), Str
         WebviewUrl::App("index.html#/search-config".into()),
     )
     .title("搜索配置")
-    .inner_size(1000.0, 800.0)
+    .inner_size(1600.0, 950.0)
     .min_inner_size(640.0, 480.0)
     .decorations(false)
     .transparent(false)
@@ -92,6 +113,17 @@ pub async fn open_search_config_window_command(app: AppHandle) -> Result<(), Str
 
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;
+    window.on_window_event(move |event| {
+        if let WindowEvent::Destroyed = event {
+            main_window
+                .set_enabled(true)
+                .map_err(|e| e.to_string())
+                .unwrap();
+            log::info!("main window enabled");
+            main_window.set_focus().map_err(|e| e.to_string()).unwrap();
+            log::info!("main window focused");
+        }
+    });
 
     log::info!("search-config window created successfully");
     Ok(())
@@ -106,7 +138,6 @@ pub async fn close_search_config_window_command(app: AppHandle) -> Result<(), St
     Ok(())
 }
 
-
 #[tauri::command]
 pub async fn open_rename_window_command(app: AppHandle, old_file_path: &str) -> Result<(), String> {
     log::info!("open_rename_window_command invoked");
@@ -115,6 +146,12 @@ pub async fn open_rename_window_command(app: AppHandle, old_file_path: &str) -> 
         let mut old_file_path_state = state.old_file_path.lock().map_err(|e| e.to_string())?;
         *old_file_path_state = Some(old_file_path.to_string());
     }
+
+    let main_window = match app.get_webview_window("main") {
+        Some(window) => window,
+        None => return Err("main window not found".to_string()),
+    };
+    main_window.set_enabled(false).map_err(|e| e.to_string())?;
 
     if let Some(existing) = app.get_webview_window("rename") {
         log::info!("rename window already exists, focusing");
@@ -128,6 +165,17 @@ pub async fn open_rename_window_command(app: AppHandle, old_file_path: &str) -> 
                 }),
             )
             .map_err(|e| e.to_string())?;
+        existing.on_window_event(move |event| {
+            if let WindowEvent::Destroyed = event {
+                main_window
+                    .set_enabled(true)
+                    .map_err(|e| e.to_string())
+                    .unwrap();
+                log::info!("main window enabled");
+                main_window.set_focus().map_err(|e| e.to_string()).unwrap();
+                log::info!("main window focused");
+            }
+        });
         return Ok(());
     }
 
@@ -150,14 +198,26 @@ pub async fn open_rename_window_command(app: AppHandle, old_file_path: &str) -> 
     window.show().map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;
 
-    window.emit(
-        "rename_old_file_path",
-        serde_json::json!({
-            "old_file_path": old_file_path,
-        }),
-    )
-    .map_err(|e| e.to_string())?;
+    window
+        .emit(
+            "rename_old_file_path",
+            serde_json::json!({
+                "old_file_path": old_file_path,
+            }),
+        )
+        .map_err(|e| e.to_string())?;
 
+    window.on_window_event(move |event| {
+        if let WindowEvent::Destroyed = event {
+            main_window
+                .set_enabled(true)
+                .map_err(|e| e.to_string())
+                .unwrap();
+            log::info!("main window enabled");
+            main_window.set_focus().map_err(|e| e.to_string()).unwrap();
+            log::info!("main window focused");
+        }
+    });
     // 调试模式下自动打开 rename 窗口自己的开发者工具，方便排查该窗口的控制台日志
     // #[cfg(debug_assertions)]
     // window.open_devtools();
