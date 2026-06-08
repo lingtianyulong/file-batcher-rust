@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import TitleBar from "../components/TitleBar.vue";
-import { FolderOpened } from "@element-plus/icons-vue";
-import { Search, Refresh, } from "@element-plus/icons-vue";
-// import { invoke } from "@tauri-apps/api/core";
+  import { ref } from "vue";
+  import TitleBar from "../components/TitleBar.vue";
+  import { FolderOpened } from "@element-plus/icons-vue";
+  import { Search, Refresh } from "@element-plus/icons-vue";
+  // import { invoke } from "@tauri-apps/api/core";
 
-const props = defineProps<{
-  modelValue: boolean;
-}>();
+  const props = defineProps<{
+    modelValue: boolean;
+  }>();
 
-const emit = defineEmits<{
-  (e: "update:modelValue", value: boolean): void;
-}>();
+  const emit = defineEmits<{
+    (e: "update:modelValue", value: boolean): void;
+  }>();
 
-const formData = ref({
-  searchPath: "",
-});
-
+  const formData = ref({
+    searchPath: "",
+  });
 </script>
 
 <template>
@@ -27,30 +26,116 @@ const formData = ref({
     <div class="main-content">
       <el-container>
         <el-aside class="left-sider-border">
-         <el-card shadow="hover" style="width: 100%">
-          <template #header>
-            <div> 包含文件属性 </div>
-          </template>
-          <div style="padding: 10px; margin-left: 20px;">
-            <el-checkbox-group class="checkbox-grid">
-              <el-checkbox label="子文件夹" />
-              <el-checkbox label="只读文件" />
-              <el-checkbox label="系统文件" />
-              <el-checkbox label="隐藏文件" />
-            </el-checkbox-group>
-          </div>
-         </el-card>
+          <el-card shadow="hover" style="width: 100%">
+            <template #header>
+              <div>包含文件属性</div>
+            </template>
+            <div style="padding: 10px; margin-left: 20px">
+              <el-checkbox-group class="checkbox-grid">
+                <el-checkbox label="子文件夹" />
+                <el-checkbox label="只读文件" />
+                <el-checkbox label="系统文件" />
+                <el-checkbox label="隐藏文件" />
+              </el-checkbox-group>
+            </div>
+          </el-card>
+          <el-card shadow="hover" style="width: 100%">
+            <template #header>
+              <div>过滤条件</div>
+            </template>
+            <div style="padding: 10px">
+              <el-form-item label="文件名" style="margin-left: 15px">
+                <el-select style="width: 180px">
+                  <el-option label="包含" value="contains" />
+                  <el-option label="不包含" value="notContains" />
+                  <el-option label="等于" value="equals" />
+                  <el-option label="不等于" value="notEquals" />
+                  <el-option label="正则表达式" value="regex" />
+                </el-select>
+                <el-checkbox
+                  label="忽略大小写"
+                  style="margin-left: 10px"
+                ></el-checkbox>
+              </el-form-item>
+              <el-input
+                type="text"
+                style="width: 350px; margin-left: 15px"
+                placeholder="请输入正则表达式或文件名"
+                clearable
+              />
+              <el-date-picker
+                style="width: 350px; margin-left: 15px; margin-top: 10px"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                value-format="YYYY-MM-DD"
+                clearable
+                single-panel
+              />
+              <el-form-item
+                label="文件大小"
+                style="margin-left: 15px; margin-top: 10px"
+              >
+                <el-select style="width: 120px" placeholder="请选择">
+                  <el-option label="大于" value="greaterThan" />
+                  <el-option label="小于" value="lessThan" />
+                  <el-option label="等于" value="equals" />
+                  <el-option label="不等于" value="notEquals" />
+                </el-select>
+                <el-label style="margin-left: 10px">单位</el-label>
+                <el-select
+                  style="width: 100px; margin-left: 10px"
+                  placeholder="单位"
+                >
+                  <el-option label="KB" value="greaterThan" />
+                  <el-option label="MB" value="lessThan" />
+                  <el-option label="GB" value="equals" />
+                </el-select>
+              </el-form-item>
+              <el-form-item
+                label="搜索文件数量"
+                style="margin-left: 15px; margin-top: 10px"
+              >
+                <el-input-number
+                  :min="0"
+                  :step="1"
+                  :max="1000"
+                  controls-position="right"
+                  style="width: 230px"
+                />
+              </el-form-item>
+            </div>
+          </el-card>
         </el-aside>
         <el-main class="main-content-container">
-          <el-card shadow="hover" :style="{ height: '150px', display: 'flex', flexDirection: 'column' }">
-            <el-form :model="formData" style="width: 100%; height: 100%; padding: 20px;">
+          <el-card
+            shadow="hover"
+            :style="{
+              height: '150px',
+              display: 'flex',
+              flexDirection: 'column',
+            }"
+          >
+            <el-form
+              :model="formData"
+              style="width: 100%; height: 100%; padding: 20px"
+            >
               <el-row gutter="20">
                 <el-col :span="24">
                   <el-form-item label="搜索路径">
-                    <el-input placeholder="请输入搜索路径" :style="{ width: '100%' }" readonly>
+                    <el-input
+                      placeholder="请输入搜索路径"
+                      :style="{ width: '100%' }"
+                      readonly
+                    >
                       <template #append>
-                        <el-button type="default" size="default" style="font-size: 16px; background-color: transparent"
-                          :icon="FolderOpened" />
+                        <el-button
+                          type="default"
+                          size="default"
+                          style="font-size: 16px; background-color: transparent"
+                          :icon="FolderOpened"
+                        />
                       </template>
                     </el-input>
                   </el-form-item>
@@ -58,13 +143,19 @@ const formData = ref({
               </el-row>
               <el-row gutter="20">
                 <el-col :span="9">
-                  <el-form-item label="文件名" style="margin-left: 15px;">
-                    <el-input placeholder="请输入文件名" :style="{ width: '100%' }" />
+                  <el-form-item label="文件名" style="margin-left: 15px">
+                    <el-input
+                      placeholder="请输入文件名"
+                      :style="{ width: '100%' }"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="9">
                   <el-form-item label="文件类型">
-                    <el-select placeholder="请选择文件类型" :style="{ width: '100%' }">
+                    <el-select
+                      placeholder="请选择文件类型"
+                      :style="{ width: '100%' }"
+                    >
                       <el-option label="所有文件" value="all" />
                       <el-option label="文本文件" value="txt" />
                       <el-option label="图片文件" value="image" />
@@ -98,94 +189,92 @@ const formData = ref({
       </el-container>
     </div>
   </div>
-
-
 </template>
 
 <style scoped>
-.search-config-page {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
+  .search-config-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 
-.title_bar {
-  width: 100%;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #dcdfe6;
-}
+  .title_bar {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #dcdfe6;
+  }
 
-.open-folder-button {
-  font-size: 24px;
-  width: 30px;
-  height: 30px;
-  border: none;
-}
+  .open-folder-button {
+    font-size: 24px;
+    width: 30px;
+    height: 30px;
+    border: none;
+  }
 
-.main-content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
+  .main-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
 
-.main-content-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-}
+  .main-content-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
 
-.left-sider-border {
-  border-right: 1px solid #dcdfe6;
-  height: 100%;
-  background-color: #ffffff;
-  overflow: hidden;
-  width: 25%;
-  transition: width 0.2s ease;
-  display: flex;
-  flex-direction: column;
-}
+  .left-sider-border {
+    border-right: 1px solid #dcdfe6;
+    height: 100%;
+    background-color: #ffffff;
+    overflow: hidden;
+    width: 25%;
+    transition: width 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
 
-.result-card {
-  margin-top: 10px;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+  .result-card {
+    margin-top: 10px;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
 
-:deep(.el-card__body) {
-  padding: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+  :deep(.el-card__body) {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
 
-.result-table {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
-}
+  .result-table {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+  }
 
-.checkbox-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 
-.checkbox-grid :deep(.el-checkbox) {
-  margin-right: 0;
-}
+  .checkbox-grid :deep(.el-checkbox) {
+    margin-right: 0;
+  }
 </style>
