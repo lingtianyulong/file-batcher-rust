@@ -3,6 +3,7 @@
   import TitleBar from "../components/TitleBar.vue";
   import { FolderOpened } from "@element-plus/icons-vue";
   import { Search, Refresh } from "@element-plus/icons-vue";
+  import { open, message } from "@tauri-apps/plugin-dialog";
 
   const props = defineProps<{
     modelValue: boolean;
@@ -12,9 +13,36 @@
     (e: "update:modelValue", value: boolean): void;
   }>();
 
-  const formData = ref({
+  const searchFormData = ref({
     searchPath: "",
+    fileType: "",
   });
+
+  const fileTypeOptions = ref([
+    { label: "所有文件(*.*)", value: "all" },
+    { label: "文本文件(*.txt)", value: "txt" },
+    { label: "图片文件(*.jpg, *.png, *.gif, *.bmp, *.ico, *.webp)", value: "image" },
+    { label: "音频文件(*.mp3, *.wav, *.ogg, *.flac, *.aac, *.m4a)", value: "audio" },
+    { label: "视频文件(*.mp4, *.avi, *.mov, *.wmv, *.flv, *.mkv)", value: "video" },
+    { label: "压缩文件(*.zip, *.rar, *.7z, *.tar, *.gz, *.bz2)", value: "zip" },
+  ]);
+
+  const handleOpenFolder = async () => {
+    try {
+      const selectedPath = await open({
+        directory: true,
+        multiple: false,
+      });
+      if (!selectedPath || Array.isArray(selectedPath)) {
+        await message("已取消选择文件夹。", { title: "提示", kind: "info" });
+        return;
+      }
+      searchFormData.value.searchPath = selectedPath;
+    } catch (error) {
+      console.error("open folder failed", error);
+    }
+  };
+
 </script>
 
 <template>
@@ -27,7 +55,7 @@
         <el-aside class="left-sider-border">
           <el-card shadow="never" style="width: 100%">
             <template #header>
-              <div>包含文件属性</div>
+              <div style="font-size: 20px; font-weight: bold">包含文件属性</div>
             </template>
             <div style="padding: 10px; margin-left: 20px">
               <el-checkbox-group class="checkbox-grid">
@@ -40,23 +68,19 @@
           </el-card>
           <el-card shadow="never" style="width: 100%; margin-top: 10px">
             <template #header>
-              <div style="font-size: 14px; font-weight: bold">过滤条件</div>
+              <div style="font-size: 20px; font-weight: bold">过滤条件</div>
             </template>
             <div style="padding: 10px; border: 1px solid #dcdfe6">
-              <div
-                style="font-size: 14px; font-weight: bold; margin-left: 10px"
-              >
+              <div style="font-size: 14px; font-weight: bold; margin-left: 10px">
                 文件名
               </div>
-              <div
-                style="
+              <div style="
                   margin-left: 10px;
                   display: flex;
                   align-items: center;
                   margin-top: 10px;
                   gap: 10px;
-                "
-              >
+                ">
                 <el-select style="width: 180px" placeholder="请选择">
                   <el-option label="包含" value="contains" />
                   <el-option label="不包含" value="notContains" />
@@ -67,50 +91,24 @@
                 <el-checkbox label="忽略大小写" style="margin-left: 10px" />
               </div>
               <div style="margin-left: 10px; margin-top: 10px">
-                <el-input
-                  type="text"
-                  style="width: 350px"
-                  placeholder="请输入正则表达式或文件名"
-                  clearable
-                />
+                <el-input type="text" style="width: 350px" placeholder="请输入正则表达式或文件名" clearable />
               </div>
             </div>
-            <div
-              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
-            >
-              <div
-                style="font-size: 14px; font-weight: bold; margin-left: 10px"
-              >
+            <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
+              <div style="font-size: 14px; font-weight: bold; margin-left: 10px">
                 文件日期
               </div>
-              <div
-                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
-              >
-                <el-date-picker
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  value-format="YYYY-MM-DD"
-                  clearable
-                  single-panel
-                />
+              <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px">
+                <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                  value-format="YYYY-MM-DD" clearable single-panel />
               </div>
             </div>
-            <div
-              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
-            >
-              <div
-                style="font-size: 14px; font-weight: bold; margin-left: 10px"
-              >
+            <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
+              <div style="font-size: 14px; font-weight: bold; margin-left: 10px">
                 文件尺寸
               </div>
-              <div
-                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
-                display: flex;
-                align-items: center;
-                gap: 10px;
-              >
+              <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px" display: flex; align-items: center;
+                gap: 10px;>
                 <el-select style="width: 180px" placeholder="请选择">
                   <el-option label="大于" value="greaterThan" />
                   <el-option label="小于" value="lessThan" />
@@ -118,78 +116,41 @@
                   <el-option label="不等于" value="notEquals" />
                 </el-select>
                 <el-label style="margin-left: 25px">单位</el-label>
-                <el-select
-                  style="width: 100px; margin-left: 10px"
-                  placeholder="单位"
-                >
+                <el-select style="width: 100px; margin-left: 10px" placeholder="单位">
                   <el-option label="KB" value="greaterThan" />
                   <el-option label="MB" value="lessThan" />
                   <el-option label="GB" value="equals" />
                 </el-select>
               </div>
               <div style="margin-left: 10px; margin-top: 10px">
-                  <el-input-number
-                  :min="0"
-                  :step="1"
-                  :max="1000"
-                  controls-position="right"
-                  style="width: 180px"
-                />
+                <el-input-number :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
               </div>
             </div>
-             <div
-              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
-            >
-              <div
-                style="font-size: 14px; font-weight: bold; margin-left: 10px"
-              >
+            <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
+              <div style="font-size: 14px; font-weight: bold; margin-left: 10px">
                 结果限制
               </div>
-              <div
-                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
-                display: flex;
-                align-items: center;
-                gap: 10px;
-              >
-               <el-input-number
-                  :min="0"
-                  :step="1"
-                  :max="1000"
-                  controls-position="right"
-                  style="width: 180px"
-                />
+              <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px" display: flex; align-items: center;
+                gap: 10px;>
+                <el-input-number :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
               </div>
             </div>
           </el-card>
         </el-aside>
         <el-main class="main-content-container">
-          <el-card
-            shadow="never"
-            :style="{
-              height: '150px',
-              display: 'flex',
-              flexDirection: 'column',
-            }"
-          >
-            <el-form
-              :model="formData"
-              style="width: 100%; height: 100%; padding: 20px"
-            >
+          <el-card shadow="never" :style="{
+            height: '150px',
+            display: 'flex',
+            flexDirection: 'column',
+          }">
+            <el-form :model="searchFormData" style="width: 100%; height: 100%; padding: 20px">
               <el-row gutter="20">
                 <el-col :span="24">
                   <el-form-item label="搜索路径">
-                    <el-input
-                      placeholder="请输入搜索路径"
-                      :style="{ width: '100%' }"
-                      readonly
-                    >
+                    <el-input v-model="searchFormData.searchPath" placeholder="请输入搜索路径" :style="{ width: '100%' }">
                       <template #append>
-                        <el-button
-                          type="default"
-                          size="default"
-                          style="font-size: 16px; background-color: transparent"
-                          :icon="FolderOpened"
-                        />
+                        <el-button type="default" size="default" style="font-size: 16px; background-color: transparent"
+                          :icon="FolderOpened" @click="handleOpenFolder" />
                       </template>
                     </el-input>
                   </el-form-item>
@@ -198,26 +159,20 @@
               <el-row gutter="20">
                 <el-col :span="9">
                   <el-form-item label="文件名" style="margin-left: 15px">
-                    <el-input
-                      placeholder="请输入文件名"
-                      :style="{ width: '100%' }"
-                    />
+                    <el-input placeholder="请输入文件名" :style="{ width: '100%' }" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="9">
                   <el-form-item label="文件类型">
-                    <el-select
-                      placeholder="请选择文件类型"
-                      :style="{ width: '100%' }"
-                    >
-                      <el-option label="所有文件" value="all" />
-                      <el-option label="文本文件" value="txt" />
-                      <el-option label="图片文件" value="image" />
-                      <el-option label="音频文件" value="audio" />
-                      <el-option label="视频文件" value="video" />
-                      <el-option label="压缩文件" value="zip" />
-                      <el-option label="其他文件" value="other" />
-                    </el-select>
+                    <el-tooltip :content="fileTypeOptions.find(option => option.value === searchFormData.fileType)?.label" placement="bottom" effect="light"
+                      popper-class="search-tooltip">
+                      <el-select v-model="searchFormData.fileType" placeholder="请选择文件类型" :style="{ width: '100%' }"
+                        collapse-tags="true" collapse-tags-tooltip="true" tag-tooltip="true">
+                        <el-option v-for="option in fileTypeOptions" :key="option.value" :label="option.label"
+                          :value="option.value" />
+                      </el-select>
+                    </el-tooltip>
+
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
@@ -230,8 +185,8 @@
             </el-form>
           </el-card>
           <el-card shadow="never" class="result-card">
-            <el-table class="result-table" border height="100%">
-              <el-table-column prop="fileName" label="文件名" />
+            <el-table class="result-table" border height="100%" :header-cell-style="{ textAlign: 'center' }">
+              <el-table-column prop="fileName" label="名称" />
               <el-table-column prop="filePath" label="文件路径" />
               <el-table-column prop="fileType" label="文件类型" />
               <el-table-column prop="fileSize" label="文件大小" />
