@@ -3,7 +3,6 @@
   import TitleBar from "../components/TitleBar.vue";
   import { FolderOpened } from "@element-plus/icons-vue";
   import { Search, Refresh } from "@element-plus/icons-vue";
-  // import { invoke } from "@tauri-apps/api/core";
 
   const props = defineProps<{
     modelValue: boolean;
@@ -26,7 +25,7 @@
     <div class="main-content">
       <el-container>
         <el-aside class="left-sider-border">
-          <el-card shadow="hover" style="width: 100%">
+          <el-card shadow="never" style="width: 100%">
             <template #header>
               <div>包含文件属性</div>
             </template>
@@ -39,51 +38,86 @@
               </el-checkbox-group>
             </div>
           </el-card>
-          <el-card shadow="hover" style="width: 100%">
+          <el-card shadow="never" style="width: 100%; margin-top: 10px">
             <template #header>
-              <div>过滤条件</div>
+              <div style="font-size: 14px; font-weight: bold">过滤条件</div>
             </template>
-            <div style="padding: 10px">
-              <el-form-item label="文件名" style="margin-left: 15px">
-                <el-select style="width: 180px">
+            <div style="padding: 10px; border: 1px solid #dcdfe6">
+              <div
+                style="font-size: 14px; font-weight: bold; margin-left: 10px"
+              >
+                文件名
+              </div>
+              <div
+                style="
+                  margin-left: 10px;
+                  display: flex;
+                  align-items: center;
+                  margin-top: 10px;
+                  gap: 10px;
+                "
+              >
+                <el-select style="width: 180px" placeholder="请选择">
                   <el-option label="包含" value="contains" />
                   <el-option label="不包含" value="notContains" />
                   <el-option label="等于" value="equals" />
                   <el-option label="不等于" value="notEquals" />
                   <el-option label="正则表达式" value="regex" />
                 </el-select>
-                <el-checkbox
-                  label="忽略大小写"
-                  style="margin-left: 10px"
-                ></el-checkbox>
-              </el-form-item>
-              <el-input
-                type="text"
-                style="width: 350px; margin-left: 15px"
-                placeholder="请输入正则表达式或文件名"
-                clearable
-              />
-              <el-date-picker
-                style="width: 350px; margin-left: 15px; margin-top: 10px"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                value-format="YYYY-MM-DD"
-                clearable
-                single-panel
-              />
-              <el-form-item
-                label="文件大小"
-                style="margin-left: 15px; margin-top: 10px"
+                <el-checkbox label="忽略大小写" style="margin-left: 10px" />
+              </div>
+              <div style="margin-left: 10px; margin-top: 10px">
+                <el-input
+                  type="text"
+                  style="width: 350px"
+                  placeholder="请输入正则表达式或文件名"
+                  clearable
+                />
+              </div>
+            </div>
+            <div
+              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
+            >
+              <div
+                style="font-size: 14px; font-weight: bold; margin-left: 10px"
               >
-                <el-select style="width: 120px" placeholder="请选择">
+                文件日期
+              </div>
+              <div
+                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
+              >
+                <el-date-picker
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  value-format="YYYY-MM-DD"
+                  clearable
+                  single-panel
+                />
+              </div>
+            </div>
+            <div
+              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
+            >
+              <div
+                style="font-size: 14px; font-weight: bold; margin-left: 10px"
+              >
+                文件尺寸
+              </div>
+              <div
+                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
+                display: flex;
+                align-items: center;
+                gap: 10px;
+              >
+                <el-select style="width: 180px" placeholder="请选择">
                   <el-option label="大于" value="greaterThan" />
                   <el-option label="小于" value="lessThan" />
                   <el-option label="等于" value="equals" />
                   <el-option label="不等于" value="notEquals" />
                 </el-select>
-                <el-label style="margin-left: 10px">单位</el-label>
+                <el-label style="margin-left: 25px">单位</el-label>
                 <el-select
                   style="width: 100px; margin-left: 10px"
                   placeholder="单位"
@@ -92,25 +126,45 @@
                   <el-option label="MB" value="lessThan" />
                   <el-option label="GB" value="equals" />
                 </el-select>
-              </el-form-item>
-              <el-form-item
-                label="搜索文件数量"
-                style="margin-left: 15px; margin-top: 10px"
-              >
-                <el-input-number
+              </div>
+              <div style="margin-left: 10px; margin-top: 10px">
+                  <el-input-number
                   :min="0"
                   :step="1"
                   :max="1000"
                   controls-position="right"
-                  style="width: 230px"
+                  style="width: 180px"
                 />
-              </el-form-item>
+              </div>
+            </div>
+             <div
+              style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px"
+            >
+              <div
+                style="font-size: 14px; font-weight: bold; margin-left: 10px"
+              >
+                结果限制
+              </div>
+              <div
+                style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px"
+                display: flex;
+                align-items: center;
+                gap: 10px;
+              >
+               <el-input-number
+                  :min="0"
+                  :step="1"
+                  :max="1000"
+                  controls-position="right"
+                  style="width: 180px"
+                />
+              </div>
             </div>
           </el-card>
         </el-aside>
         <el-main class="main-content-container">
           <el-card
-            shadow="hover"
+            shadow="never"
             :style="{
               height: '150px',
               display: 'flex',
@@ -175,7 +229,7 @@
               </el-row>
             </el-form>
           </el-card>
-          <el-card shadow="hover" class="result-card">
+          <el-card shadow="never" class="result-card">
             <el-table class="result-table" border height="100%">
               <el-table-column prop="fileName" label="文件名" />
               <el-table-column prop="filePath" label="文件路径" />

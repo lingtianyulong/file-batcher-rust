@@ -390,7 +390,8 @@
   .siderbar {
     background: #ffffff;
     transition: width 0.2s ease;
-    overflow: hidden; /* 移除滚动条 */
+    overflow: hidden;
+    /* 移除滚动条 */
   }
 
   .file-list-container {
