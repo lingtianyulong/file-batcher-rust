@@ -86,34 +86,6 @@
         />
       </el-tooltip>
     </div>
-    <!-- <div class="open-folder">
-      <el-lable class="lable">搜索条件</el-lable>
-      <el-input
-        type="text"
-        :style="{ width: '65%' }"
-        placeholder="请输入搜索条件"
-      />
-      <el-button
-        type="default"
-        style="font-size: 16px; background-color: transparent"
-        size="default"
-        :icon="icons.Search"
-      />
-      <el-tooltip
-        content="设置搜索选项"
-        placement="bottom"
-        effect="light"
-        popper-class="search-tooltip"
-      >
-        <el-button
-          type="default"
-          style="font-size: 16px; background-color: transparent"
-          size="default"
-          :icon="icons.Setting"
-          @click="handleOpenSearchConfig"
-        />
-      </el-tooltip>
-    </div> -->
   </div>
 </template>
 
