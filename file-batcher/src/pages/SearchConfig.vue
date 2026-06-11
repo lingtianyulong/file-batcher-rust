@@ -13,10 +13,56 @@
     (e: "update:modelValue", value: boolean): void;
   }>();
 
+  /** 搜索表单数据 */
   const searchFormData = ref({
     searchPath: "",
     fileType: "",
+    fileName: "",
   });
+
+  const folderOptions = ref([
+    { label: "子文件夹", value: "subFolder" },
+    { label: "只读文件", value: "readOnly" },
+    { label: "系统文件", value: "systemFile" },
+    { label: "隐藏文件", value: "hiddenFile" },
+  ]);
+
+  const fileOptions = ref([
+    { label: "包含", value: "contains" },
+    { label: "不包含", value: "notContains" },
+    { label: "等于", value: "equals" },
+    { label: "不等于", value: "notEquals" },
+    { label: "正则表达式", value: "regex" },
+  ]);
+
+  const fileSizeOptions = ref([
+    { label: "大于", value: "greaterThan" },
+    { label: "小于", value: "lessThan" },
+    { label: "等于", value: "equals" },
+    { label: "不等于", value: "notEquals" },
+  ]);
+
+  const unitOptions = ref([
+    { label: "KB", value: "KB" },
+    { label: "MB", value: "MB" },
+    { label: "GB", value: "GB" },
+  ]);
+
+  const filterData = ref ({
+    checkFolderOptions: [],
+    fileFilter: {
+      option: "",
+      caseInsensitive: false,
+      value: "",
+    },
+    dateRanage:"",
+    fileSize: {
+      option: "",
+      unit: "",
+      value: 1000,
+    },
+    resultLimit: 1000,
+  })
 
   const fileTypeOptions = ref([
     { label: "所有文件(*.*)", value: "all" },
@@ -58,11 +104,8 @@
               <div style="font-size: 20px; font-weight: bold">包含文件属性</div>
             </template>
             <div style="padding: 10px; margin-left: 20px">
-              <el-checkbox-group class="checkbox-grid">
-                <el-checkbox label="子文件夹" />
-                <el-checkbox label="只读文件" />
-                <el-checkbox label="系统文件" />
-                <el-checkbox label="隐藏文件" />
+              <el-checkbox-group v-model="filterData.checkFolderOptions" class="checkbox-grid">
+                <el-checkbox v-for="option in folderOptions" :label="option.label" :value="option.value" />
               </el-checkbox-group>
             </div>
           </el-card>
@@ -81,17 +124,13 @@
                   margin-top: 10px;
                   gap: 10px;
                 ">
-                <el-select style="width: 180px" placeholder="请选择">
-                  <el-option label="包含" value="contains" />
-                  <el-option label="不包含" value="notContains" />
-                  <el-option label="等于" value="equals" />
-                  <el-option label="不等于" value="notEquals" />
-                  <el-option label="正则表达式" value="regex" />
+                <el-select v-model="filterData.fileFilter.option" style="width: 180px" placeholder="请选择">
+                  <el-option v-for="option in fileOptions" :label="option.label" :value="option.value" />
                 </el-select>
-                <el-checkbox label="忽略大小写" style="margin-left: 10px" />
+                <el-checkbox v-model="filterData.fileFilter.caseInsensitive" label="忽略大小写" style="margin-left: 10px" />
               </div>
               <div style="margin-left: 10px; margin-top: 10px">
-                <el-input type="text" style="width: 350px" placeholder="请输入正则表达式或文件名" clearable />
+                <el-input v-model="filterData.fileFilter.value" type="text" style="width: 350px" placeholder="请输入正则表达式或文件名" clearable />
               </div>
             </div>
             <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
@@ -100,7 +139,7 @@
               </div>
               <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px">
                 <el-date-picker type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
-                  value-format="YYYY-MM-DD" clearable single-panel />
+                  v-model="filterData.dateRanage" value-format="YYYY-MM-DD" clearable single-panel />
               </div>
             </div>
             <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
@@ -109,21 +148,16 @@
               </div>
               <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px" display: flex; align-items: center;
                 gap: 10px;>
-                <el-select style="width: 180px" placeholder="请选择">
-                  <el-option label="大于" value="greaterThan" />
-                  <el-option label="小于" value="lessThan" />
-                  <el-option label="等于" value="equals" />
-                  <el-option label="不等于" value="notEquals" />
+                <el-select v-model="filterData.fileSize.option" style="width: 180px" placeholder="请选择">
+                  <el-option v-for="option in fileSizeOptions" :label="option.label" :value="option.value" />
                 </el-select>
                 <el-label style="margin-left: 25px">单位</el-label>
-                <el-select style="width: 100px; margin-left: 10px" placeholder="单位">
-                  <el-option label="KB" value="greaterThan" />
-                  <el-option label="MB" value="lessThan" />
-                  <el-option label="GB" value="equals" />
+                <el-select v-model="filterData.fileSize.unit" style="width: 100px; margin-left: 10px" placeholder="单位">
+                  <el-option v-for="option in unitOptions" :label="option.label" :value="option.value" />
                 </el-select>
               </div>
               <div style="margin-left: 10px; margin-top: 10px">
-                <el-input-number :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
+                <el-input-number v-model="filterData.fileSize.value" :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
               </div>
             </div>
             <div style="margin-top: 0px; border: 1px solid #dcdfe6; padding: 10px">
@@ -132,7 +166,7 @@
               </div>
               <div style="margin-left: 10px; margin-top: 20px; margin-bottom: 10px" display: flex; align-items: center;
                 gap: 10px;>
-                <el-input-number :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
+                <el-input-number v-model="filterData.resultLimit" :min="0" :step="1" :max="1000" controls-position="right" style="width: 180px" />
               </div>
             </div>
           </el-card>
@@ -159,7 +193,7 @@
               <el-row gutter="20">
                 <el-col :span="9">
                   <el-form-item label="文件名" style="margin-left: 15px">
-                    <el-input placeholder="请输入文件名" :style="{ width: '100%' }" />
+                    <el-input v-model="searchFormData.fileName" placeholder="请输入文件名" :style="{ width: '100%' }" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="9">
