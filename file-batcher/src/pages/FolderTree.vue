@@ -412,21 +412,18 @@ const customColor = (precentage: number): string => {
       :expand-on-click-node="false"
       @node-click="handleNodeClick"
       @node-expand="handleNodeExpand"
-      @node-collapse="handleNodeCollapse"
-    >
+      @node-collapse="handleNodeCollapse">
       <template #default="{ node, data }">
         <div class="tree-node">
           <div v-if="data.type === 'monitor'">
             <Icon
               icon="line-md:computer-twotone"
-              style="height: 15px; width: 15px"
-            />
+              style="height: 15px; width: 15px" />
           </div>
           <div v-else-if="data.type === 'disk'">
             <Icon
               icon="icon-park-twotone:hard-disk"
-              style="height: 15px; width: 15px"
-            />
+              style="height: 15px; width: 15px" />
           </div>
           <div v-else-if="data.type === 'folder'">
             <Icon icon="glyphs-poly:folder" style="height: 16px; width: 16px" />
@@ -434,8 +431,7 @@ const customColor = (precentage: number): string => {
           <div v-else>
             <Icon
               :icon="getFileIcon(data.type)"
-              style="height: 15px; width: 15px"
-            />
+              style="height: 15px; width: 15px" />
           </div>
           <span>{{ node.label }}</span>
         </div>
@@ -447,8 +443,7 @@ const customColor = (precentage: number): string => {
     <div class="disk-info">
       <div
         style="font-size: 13px"
-        v-if="diskInfo.diskName && diskInfo.mountPoint"
-      >
+        v-if="diskInfo.diskName && diskInfo.mountPoint">
         {{
           (diskInfo.diskName ?? "") +
           " (" +
@@ -466,8 +461,7 @@ const customColor = (precentage: number): string => {
               : 0
           "
           :show-text="false"
-          :color="customColor"
-        />
+          :color="customColor" />
       </div>
       <span style="font-size: 13px"
         >可用: {{ diskInfo.freeSpace ?? 0 }} GB, 总容量:
