@@ -12,7 +12,18 @@
       "isBackground": true,
       // change this to your `beforeDevCommand`:
       "command": "pnpm",
-      "args": ["dev"]
+      "args": ["dev"],
+      "problemMatcher": {
+        "owner": "vite",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "ready in"
+        },
+        "pattern":{
+          "regexp": "."
+        }
+      }
     },
     {
       "label": "ui:build",
