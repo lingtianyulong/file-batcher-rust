@@ -6,6 +6,7 @@ mod disks;
 mod file_sys;
 mod login;
 mod register;
+mod file_search;
 
 use chrono::Local;
 use commands::contextmenu_commands::*;
