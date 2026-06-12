@@ -1,108 +1,105 @@
 <script lang="ts" setup>
-  import { ref } from "vue";
-  import { invoke } from "@tauri-apps/api/core";
-  import { listen, emit } from "@tauri-apps/api/event";
-  import { onMounted, onUnmounted, watch } from "vue";
-  import TitleBar from "../components/TitleBar.vue";
-  import { basename, dirname, join, extname } from "@tauri-apps/api/path";
-  import { reactive } from "vue";
-  import { ElMessage } from "element-plus";
+import { ref } from "vue";
+import { invoke } from "@tauri-apps/api/core";
+import { listen, emit } from "@tauri-apps/api/event";
+import { onMounted, onUnmounted, watch } from "vue";
+import TitleBar from "../components/TitleBar.vue";
+import { basename, dirname, join, extname } from "@tauri-apps/api/path";
+import { reactive } from "vue";
+import { ElMessage } from "element-plus";
 
-  const oldFilePath = ref<string>("");
-  const oldFileName = ref<string>("");
+const oldFilePath = ref<string>("");
+const oldFileName = ref<string>("");
 
-  const formData = reactive({
-    fileDir: "",
-    oldFileName: "",
-    newFileName: "",
-    fileExtension: "",
+const formData = reactive({
+  fileDir: "",
+  oldFileName: "",
+  newFileName: "",
+  fileExtension: "",
+});
+
+let unlisten: (() => void) | undefined;
+
+onMounted(async () => {
+  console.log("onMounted in rename page");
+
+  unlisten = await listen("rename_old_file_path", (event) => {
+    console.log("listen rename_old_file_path in rename page", event.payload);
+    oldFilePath.value = (
+      event.payload as { old_file_path: string }
+    ).old_file_path;
   });
-
-  let unlisten: (() => void) | undefined;
-
-  onMounted(async () => {
-    console.log("onMounted in rename page");
-
-    unlisten = await listen("rename_old_file_path", (event) => {
-      console.log("listen rename_old_file_path in rename page", event.payload);
-      oldFilePath.value = (
-        event.payload as { old_file_path: string }
-      ).old_file_path;
-    });
-    formData.oldFileName = oldFilePath.value.split("/").pop() ?? "";
-    const requestedOldFilePath = await invoke<string | null>(
-      "request_rename_old_file_path_command",
-    );
-    if (requestedOldFilePath) {
-      console.log(
-        "requested old file path in rename page",
-        requestedOldFilePath,
-      );
-      oldFilePath.value = requestedOldFilePath;
-      formData.fileDir = await dirname(requestedOldFilePath);
-      formData.oldFileName = await basename(requestedOldFilePath);
-      formData.fileExtension = await extname(requestedOldFilePath);
-    }
-  });
-
-  onUnmounted(() => {
-    if (unlisten) {
-      unlisten();
-      unlisten = undefined;
-    }
-  });
-
-  watch(
-    () => {
-      console.log("watch oldFilePath in rename page", oldFilePath.value);
-      return oldFilePath.value;
-    },
-    async (newVal: string) => {
-      console.log("watch oldFilePath new value", newVal);
-      formData.oldFileName = await basename(newVal);
-      formData.fileExtension = await extname(newVal);
-      console.log("watch oldFileName", oldFileName.value);
-    },
-    {
-      immediate: true,
-    },
+  formData.oldFileName = oldFilePath.value.split("/").pop() ?? "";
+  const requestedOldFilePath = await invoke<string | null>(
+    "request_rename_old_file_path_command",
   );
+  if (requestedOldFilePath) {
+    console.log("requested old file path in rename page", requestedOldFilePath);
+    oldFilePath.value = requestedOldFilePath;
+    formData.fileDir = await dirname(requestedOldFilePath);
+    formData.oldFileName = await basename(requestedOldFilePath);
+    formData.fileExtension = await extname(requestedOldFilePath);
+  }
+});
 
-  const handleRename = async () => {
-    console.log("handleRename in rename page", formData);
-    const oldfilePath = await join(formData.fileDir, formData.oldFileName);
-    let newfilePath = await join(formData.fileDir, formData.newFileName);
-    newfilePath = newfilePath + "." + formData.fileExtension;
-    console.log("oldfilePath", oldfilePath);
-    console.log("newfilePath", newfilePath);
-    await invoke("rename_file_command", {
-      source: oldfilePath,
-      target: newfilePath,
-    })
-      .then(async () => {
-        ElMessage.success("重命名成功");
+onUnmounted(() => {
+  if (unlisten) {
+    unlisten();
+    unlisten = undefined;
+  }
+});
 
-        await emit("file_renamed", {
-          file_dir: formData.fileDir,
-          old_file_path: oldfilePath,
-          new_file_path: newfilePath,
-        });
+watch(
+  () => {
+    console.log("watch oldFilePath in rename page", oldFilePath.value);
+    return oldFilePath.value;
+  },
+  async (newVal: string) => {
+    console.log("watch oldFilePath new value", newVal);
+    formData.oldFileName = await basename(newVal);
+    formData.fileExtension = await extname(newVal);
+    console.log("watch oldFileName", oldFileName.value);
+  },
+  {
+    immediate: true,
+  },
+);
 
-        // await invoke("close_rename_window_command");
-      })
-      .catch((error) => {
-        console.error("rename file failed:", error);
-        ElMessage.error("重命名失败");
-      })
-      .finally(async () => {
-        await invoke("close_rename_window_command");
+const handleRename = async () => {
+  console.log("handleRename in rename page", formData);
+  const oldfilePath = await join(formData.fileDir, formData.oldFileName);
+  let newfilePath = await join(formData.fileDir, formData.newFileName);
+  newfilePath = newfilePath + "." + formData.fileExtension;
+  console.log("oldfilePath", oldfilePath);
+  console.log("newfilePath", newfilePath);
+  await invoke("rename_file_command", {
+    source: oldfilePath,
+    target: newfilePath,
+  })
+    .then(async () => {
+      ElMessage.success("重命名成功");
+
+      await emit("file_renamed", {
+        file_dir: formData.fileDir,
+        old_file_path: oldfilePath,
+        new_file_path: newfilePath,
       });
-  };
 
-  const handleCancel = async () => {
-    console.log("handleCancel in rename page");
-    await invoke("close_rename_window_command");
-  };
+      // await invoke("close_rename_window_command");
+    })
+    .catch((error) => {
+      console.error("rename file failed:", error);
+      ElMessage.error("重命名失败");
+    })
+    .finally(async () => {
+      await invoke("close_rename_window_command");
+    });
+};
+
+const handleCancel = async () => {
+  console.log("handleCancel in rename page");
+  await invoke("close_rename_window_command");
+};
 </script>
 
 <template>
@@ -148,37 +145,37 @@
 </template>
 
 <style scoped>
-  .rename-page {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 40px;
-    overflow: hidden;
-  }
-  .old-file-name {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    align-items: center;
-    justify-content: start;
-    padding: 0 16px;
-  }
+.rename-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+}
+.old-file-name {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  align-items: center;
+  justify-content: start;
+  padding: 0 16px;
+}
 
-  .rename-footer {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 40px;
-    overflow: hidden;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-  }
+.rename-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
 
-  .button-style {
-    width: 100px;
-    height: 30px;
-  }
+.button-style {
+  width: 100px;
+  height: 30px;
+}
 </style>

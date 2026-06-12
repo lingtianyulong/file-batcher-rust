@@ -1,18 +1,18 @@
 <script setup lang="ts">
-  import { onMounted, onUnmounted } from "vue";
-  import "element-plus/dist/index.css";
+import { onMounted, onUnmounted } from "vue";
+import "element-plus/dist/index.css";
 
-  const handleContextMenu = async (event: MouseEvent) => {
-    event.preventDefault();
-  };
+const handleContextMenu = async (event: MouseEvent) => {
+  event.preventDefault();
+};
 
-  onMounted(() => {
-    document.addEventListener("contextmenu", handleContextMenu);
-  });
+onMounted(() => {
+  document.addEventListener("contextmenu", handleContextMenu);
+});
 
-  onUnmounted(() => {
-    document.removeEventListener("contextmenu", handleContextMenu);
-  });
+onUnmounted(() => {
+  document.removeEventListener("contextmenu", handleContextMenu);
+});
 </script>
 
 <template>
@@ -20,34 +20,34 @@
 </template>
 
 <style>
-  html,
-  body,
-  #app {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    background: #ffffff;
-  }
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
 
-  .layout > .el-aside {
-    background: #ffffff !important;
-  }
+.layout > .el-aside {
+  background: #ffffff !important;
+}
 
-  .layout > .el-aside .el-menu-item {
-    color: #2c3e50;
-    font-weight: 500;
-  }
+.layout > .el-aside .el-menu-item {
+  color: #2c3e50;
+  font-weight: 500;
+}
 
-  .layout > .el-aside .el-menu-item .el-icon {
-    color: #4a5568;
-  }
+.layout > .el-aside .el-menu-item .el-icon {
+  color: #4a5568;
+}
 
-  .layout > .el-aside .el-menu-item.is-active {
-    color: #1a6fc4 !important;
-    font-weight: 600;
-  }
+.layout > .el-aside .el-menu-item.is-active {
+  color: #1a6fc4 !important;
+  font-weight: 600;
+}
 
-  .layout > .el-aside .el-menu-item.is-active .el-icon {
-    color: #1a6fc4 !important;
-  }
+.layout > .el-aside .el-menu-item.is-active .el-icon {
+  color: #1a6fc4 !important;
+}
 </style>

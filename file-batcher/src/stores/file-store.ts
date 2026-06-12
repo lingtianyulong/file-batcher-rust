@@ -1,19 +1,18 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useFolderStore = defineStore('folder', {
-    state: () => ({
-        currentPath: '' as string,
-        fileList: [] as string[]
-    }),
+export const useFolderStore = defineStore("folder", {
+  state: () => ({
+    currentPath: "" as string,
+    fileList: [] as string[],
+  }),
 
-    actions: {
-        setPath(path: string) {
-            this.currentPath = path
-        },
+  actions: {
+    setPath(path: string) {
+      this.currentPath = path;
+    },
 
-        setFiles(files: string[]) {
-            this.fileList = files
-        }
-    }
-})
-
+    setFiles(files: string[]) {
+      this.fileList = files;
+    },
+  },
+});
