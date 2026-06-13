@@ -23,14 +23,14 @@ impl FileSystemProvider for WindowsProvider {
 
     async fn metadata(&self) {
         log::info!("WindowsProvider metadata");
-        let file = File::open(r"\\.\C:").unwrap();
-        let mut reader = BufReader::new(file);
-        let ntfs = Ntfs::new(&mut reader).unwrap();
+        // let file = File::open(r"\\.\C:").unwrap();
+        // let mut reader = BufReader::new(file);
+        // let ntfs = Ntfs::new(&mut reader).unwrap();
 
-        let root = ntfs.root_directory(&mut reader).unwrap();
-        let attrs = root.attributes();
-        log::info!("WindowsProvider metadata: {:?}", attrs);
-        // for attr in attrs {
+        // let root = ntfs.root_directory(&mut reader).unwrap();
+        // let attrs = root.attributes();
+        // log::info!("WindowsProvider metadata: {:?}", attrs);
+        // // for attr in attrs {
         //     log::info!("WindowsProvider metadata: {}", attr.name());
         // }
         // let entries = root.entries().unwrap();
