@@ -3,10 +3,10 @@
 mod commands;
 mod common;
 mod disks;
+mod file_search;
 mod file_sys;
 mod login;
 mod register;
-mod file_search;
 
 use chrono::Local;
 use commands::contextmenu_commands::*;
@@ -14,6 +14,7 @@ use commands::directory_commands::*;
 use commands::diskinfo_commands::*;
 use commands::file_info_commands::*;
 use commands::file_op_commands::*;
+use commands::file_search_commands::*;
 use commands::window_commands::*;
 use login::commands::login_command;
 use register::{DB_URL, register_command};
@@ -59,6 +60,7 @@ pub fn run() {
     };
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
@@ -100,6 +102,7 @@ pub fn run() {
             open_rename_window_command,
             request_rename_old_file_path_command,
             close_rename_window_command,
+            scan_files_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

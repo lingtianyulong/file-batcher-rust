@@ -114,6 +114,8 @@ onMounted(async () => {
     });
   }
 
+  await invoke("scan_files_command");
+
   unlistenFileRenamed = await listen("file_renamed", async (event) => {
     const payload = event.payload as { file_dir?: string };
     const fileDir = payload?.file_dir ?? "";
@@ -286,34 +288,29 @@ function handleRowContextmenu(
             :header-cell-style="{ textAlign: 'center' }"
             v-loading="loading"
             element-loading-text="加载中..."
-            @row-contextmenu="handleRowContextmenu"
-          >
+            @row-contextmenu="handleRowContextmenu">
             <el-table-column type="selection" width="48" align="center" />
             <el-table-column
               prop="fileName"
               label="文件名"
               show-overflow-tooltip
-              min-width="140"
-            />
+              min-width="140" />
             <el-table-column
               prop="fileType"
               label="文件类型"
               align="center"
-              width="100"
-            />
+              width="100" />
             <el-table-column
               prop="fileSize"
               label="文件大小"
               align="center"
-              width="100"
-            />
+              width="100" />
             <el-table-column
               prop="fileCreateTime"
               label="创建时间"
               align="center"
               min-width="150"
-              :width="200"
-            >
+              :width="200">
               <template #default="scoped">
                 {{ formatDisplayTime(scoped.row.fileCreateTime) }}
               </template>
@@ -323,8 +320,7 @@ function handleRowContextmenu(
               label="修改时间"
               align="center"
               min-width="150"
-              :width="200"
-            >
+              :width="200">
               <template #default="scoped">
                 {{ formatDisplayTime(scoped.row.fileModifyTime) }}
               </template>
@@ -333,8 +329,7 @@ function handleRowContextmenu(
               label="操作"
               align="center"
               width="100"
-              fixed="right"
-            >
+              fixed="right">
               <template #default="scoped">
                 <el-button
                   type="primary"
@@ -342,8 +337,7 @@ function handleRowContextmenu(
                   size="small"
                   style="font-size: 15px"
                   :icon="icons.View"
-                  @click="handlePreview(scoped.row)"
-                >
+                  @click="handlePreview(scoped.row)">
                   预览
                 </el-button>
               </template>

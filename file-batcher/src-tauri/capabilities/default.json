@@ -33,16 +33,16 @@
     "dialog:allow-open",
     "log:default",
     "dialog:default",
-    "sql:default",
-    "sql:allow-close",
-    "sql:allow-execute",
-    "sql:allow-load",
-    "sql:allow-select",
     "fs:default",
     "fs:allow-read",
     "fs:allow-write",
     "fs:allow-remove",
     "fs:allow-mkdir",
-    "fs:allow-copy-file"
+    "fs:allow-copy-file",
+    "sql:default",
+    "sql:allow-close",
+    "sql:allow-execute",
+    "sql:allow-load",
+    "sql:allow-select"
   ]
 }

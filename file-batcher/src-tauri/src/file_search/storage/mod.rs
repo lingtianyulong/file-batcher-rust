@@ -1,16 +1,27 @@
+#![allow(dead_code)]
+
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct FileId(u64);
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct ParentId(u64);
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FullPath(String);
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileName(String);
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct FileSize(u64);
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileType(String);
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct CreateTime(i64);
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct ModifyTime(i64);
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct IsDir(bool);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileInfo {
     pub file_id: FileId,
     pub parent_id: ParentId,
@@ -85,7 +96,7 @@ impl FileInfo {
     }
 
     pub fn get_full_path(&self) -> FullPath {
-        self.full_path
+        self.full_path.clone()
     }
 
     pub fn set_file_name(&mut self, file_name: FileName) {
@@ -93,7 +104,7 @@ impl FileInfo {
     }
 
     pub fn get_file_name(&self) -> FileName {
-        self.file_name
+        self.file_name.clone()
     }
 
     pub fn set_file_size(&mut self, file_size: FileSize) {
@@ -109,7 +120,7 @@ impl FileInfo {
     }
 
     pub fn get_file_type(&self) -> FileType {
-        self.file_type
+        self.file_type.clone()
     }
 
     pub fn set_create_time(&mut self, create_time: CreateTime) {

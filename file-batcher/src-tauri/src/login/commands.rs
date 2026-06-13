@@ -9,12 +9,4 @@ pub fn login_command(username: String, password: String) -> Result<String, Strin
     );
 
     Err(String::from("登录失败，账号或密码错误!"))
-
-    // Ok(String::from("login success"))
-    // let user = User {
-    //     id: 1,
-    //     username,
-    //     password,
-    // };
-    // Ok(user.to_string())
 }

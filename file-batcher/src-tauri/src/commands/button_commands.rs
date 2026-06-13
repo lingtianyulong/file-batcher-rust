@@ -40,4 +40,3 @@ fn emit_file_list_progress(
         log::error!("emit file list progress failed, the error is {}", e);
     }
 }
-

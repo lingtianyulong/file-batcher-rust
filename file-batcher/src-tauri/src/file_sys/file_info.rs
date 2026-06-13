@@ -1,7 +1,7 @@
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::{ Path };
+use std::path::Path;
 use std::time::SystemTime;
 
 #[derive(Debug, Serialize, Deserialize)]
