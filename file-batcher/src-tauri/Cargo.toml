@@ -37,7 +37,7 @@ sqlx = { version = "0.8.6", features = [
     "chrono",
     "uuid"] }
 
-uuid = {version = "1.23.1", features = ["v7", "rng-rand", "serde"] }
+uuid = {version = "1.23.1", features = ["v4", "rng-rand", "serde"] }
 sysinfo = "0.39.2"
 walkdir = "2.5.0"
 tauri-plugin-fs = "2"
