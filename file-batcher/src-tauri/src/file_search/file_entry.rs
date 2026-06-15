@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileEntry {
     pub id: u128,
@@ -30,6 +31,7 @@ impl Default for FileEntry {
     }
 }
 
+#[allow(dead_code)]
 impl FileEntry {
     pub fn set_id(&mut self, id: u128) {
         self.id = id;
